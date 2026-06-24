@@ -94,7 +94,6 @@ This burn placed the crew on a **free-return trajectory**: a precisely calculate
 
 ### Days 3–5 — The Outbound Journey
 
-![Astronaut looking at Earth through Orion's window](../../assets/blog/artemis2/earth-from-orion-window.png)
 *Image credit: NASA. An Artemis II crew member gazes at Earth through Orion's window during the outbound transit to the Moon.*
 
 Three days of cruise, system monitoring, and crew activities. The crew:
@@ -105,7 +104,6 @@ Three days of cruise, system monitoring, and crew activities. The crew:
 
 ### Day 6 — The Lunar Flyby
 
-![Orion spacecraft with the Moon visible in the distance](../../assets/blog/artemis2/orion-moon-in-distance.png)
 *Image credit: NASA. The Orion spacecraft with the Moon visible in the distance — captured during Artemis II's deep space transit.*
 
 The emotional and scientific peak of the mission.
