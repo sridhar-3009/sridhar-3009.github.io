@@ -22,7 +22,9 @@ latest_posts:
   enabled: true
   scrollable: true
   limit: 3
----
+<style>
+  .profile.float-right { width: 28% !important; max-width: 260px; }
+</style>
 
 I'm a **Machine Learning Engineer at Accenture** and the founder of **MailAir** — an AI-powered
 email assistant that uses LLMs and RAG to auto-draft replies, summarise threads, and surface
