@@ -1,14 +1,12 @@
 github_users:
-  - torvalds
-  - alshedivat
+  - sridhar-3009
 
 repo_description_lines_max: 2
 
 github_repos:
-  - alshedivat/al-folio
-  - jekyll/jekyll
-  - twbs/bootstrap
-  - jquery/jquery
-  - FortAwesome/Font-Awesome
-  - mathjax/MathJax
-  - jpswalsh/academicons
+  - sridhar-3009/sridhar-3009.github.io
+  - sridhar-3009/agents-at-scale-ark
+  - sridhar-3009/Adaptive-AI-Tutor
+  - sridhar-3009/Advanced-Multimodal-AI-for-Hate-Speech-and-Misinformation-Detection
+  - sridhar-3009/Adaptive-Real-Time-Route-Intelligence-Engine-using-A-and-Bidirectional-Dijkstra
+  - sridhar-3009/AgroPulse-AI
