@@ -11,10 +11,6 @@ profile:
   align: right
   image: prof_pic.jpg
   image_circular: true
-  more_info: >
-    <p>Machine Learning Engineer</p>
-    <p>Hyderabad, India</p>
-    <p>Open to SDE / ML opportunities</p>
 
 selected_papers: false
 social: true
