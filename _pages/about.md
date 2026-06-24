@@ -22,6 +22,8 @@ latest_posts:
   enabled: true
   scrollable: true
   limit: 3
+---
+
 <style>
   .profile.float-right { width: 28% !important; max-width: 260px; }
 </style>
