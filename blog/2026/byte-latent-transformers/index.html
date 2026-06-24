@@ -1,0 +1,375 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <title> Byte-Latent Transformers: Training AI Without a Tokenizer | Sai Sridhar Tarra </title> <meta name="author" content="Sai Sridhar Tarra"> <meta name="description" content="Every LLM you've ever used runs on a tokenizer that chops text into chunks before the model sees a single character. Meta's Byte-Latent Transformer throws that away entirely — and matches LLaMA 3 performance. Here's how."> <meta name="keywords" content="machine learning, AI engineer, LLM, MLOps, NLP, portfolio, Sai Sridhar Tarra"> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <style>
+  :root {
+    --max-content-width: 930px;
+  }
+</style> <link rel="stylesheet" href="/assets/css/tailwind.css?v=50c64c15cbb9fd1ce6056fdb8bcb4b62"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.5/css/academicons.min.css" integrity="sha256-SzrCOBJbGVFMahewkgjwnApaV2+av1DwMAA+/QGLyZw=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/scholar-icons@1.0.3/css/scholar-icons.css" integrity="sha256-VY3hHVj/hNX3fYG6wtbA6TcKJQl7+FthzGSyIB64klY=" crossorigin="anonymous"> <link defer rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&amp;display=swap"> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-github.css?v=591dab5a4e56573bf4ef7fd332894c99" media="" id="highlight_theme_light"> <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%E2%9A%A1&lt;/text&gt;&lt;/svg&gt;"> <link rel="stylesheet" href="/assets/css/main.css?v=f0b101217084a90093badfe99ff9a7d1"> <link rel="canonical" href="https://sridhar-3009.github.io/blog/2026/byte-latent-transformers/"> <script src="/assets/js/theme.js?v=7af685e2ba20b37fef545c97b8064050"></script> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-native.css?v=5847e5ed4a4568527aa6cfab446049ca" media="none" id="highlight_theme_dark"> <script>
+    initTheme();
+  </script> </head> <body class="fixed-top-nav "> <header> <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top" role="navigation"> <div class="container"> <a class="navbar-brand title font-weight-lighter" href="/"> Sai Sridhar Tarra </a> <button class="navbar-toggler collapsed navbar-toggler-main" type="button" data-nav-toggle="navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar top-bar"></span> <span class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span> </button> <div class="collapse navbar-collapse navbar-collapse-main" id="navbarNav"> <ul class="navbar-nav navbar-menu-list flex-nowrap"> <li class="nav-item "> <a class="nav-link" href="/">about </a> </li> <li class="nav-item active"> <a class="nav-link" href="/blog/">blog </a> </li> <li class="nav-item "> <a class="nav-link" href="/publications/">publications </a> </li> <li class="nav-item "> <a class="nav-link" href="/projects/">projects </a> </li> <li class="nav-item "> <a class="nav-link" href="/repositories/">repositories </a> </li> <li class="nav-item "> <a class="nav-link" href="/cv/">CV </a> </li> <li class="nav-item "> <a class="nav-link" href="/teaching/">teaching </a> </li> <li class="nav-item "> <a class="nav-link" href="/people/">people </a> </li> <li class="nav-item dropdown "> <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-nav-dropdown-toggle="true" aria-haspopup="true" aria-expanded="false">submenus </a> <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown"> <a class="dropdown-item " href="/books/">bookshelf</a> <div class="dropdown-divider"></div> <a class="dropdown-item " href="/blog/">blog</a> </div> </li> <li class="nav-item"> <button id="search-toggle" type="button" title="Search" aria-label="Open search"> <span class="nav-link">ctrl k <i class="fa-solid fa-magnifying-glass"></i></span> </button> </li> <li class="toggle-container"> <button id="light-toggle" type="button" title="Change theme" aria-label="Change color theme"> <i class="fa-half-sun-moon" id="light-toggle-system"></i> <i class="fa-solid fa-moon" id="light-toggle-dark"></i> <i class="fa-solid fa-sun" id="light-toggle-light"></i> </button> </li> </ul> </div> </div> </nav> <progress id="progress" value="0"> <div class="progress-container"> <span class="progress-bar"></span> </div> </progress> </header> <div class="container mt-5" role="main"> <div class="post"> <header class="post-header"> <h1 class="post-title">Byte-Latent Transformers: Training AI Without a Tokenizer</h1> <p class="post-meta"> Created on May 14, 2026 </p> <p class="post-tags"> <a href="/blog/2026"> <i class="fa-solid fa-calendar fa-sm"></i> 2026 </a>   ·   <a href="/blog/tag/blt"> <i class="fa-solid fa-hashtag fa-sm"></i> BLT</a>   <a href="/blog/tag/tokenization"> <i class="fa-solid fa-hashtag fa-sm"></i> Tokenization</a>   <a href="/blog/tag/transformers"> <i class="fa-solid fa-hashtag fa-sm"></i> Transformers</a>   <a href="/blog/tag/meta-ai"> <i class="fa-solid fa-hashtag fa-sm"></i> Meta AI</a>   <a href="/blog/tag/byte-models"> <i class="fa-solid fa-hashtag fa-sm"></i> Byte Models</a>   <a href="/blog/tag/llms"> <i class="fa-solid fa-hashtag fa-sm"></i> LLMs</a>   <a href="/blog/tag/architecture"> <i class="fa-solid fa-hashtag fa-sm"></i> Architecture</a>   ·   <a href="/blog/category/deep-learning"> <i class="fa-solid fa-tag fa-sm"></i> deep-learning</a> </p> </header> <article class="post-content"> <div id="markdown-content"> <h1 id="byte-latent-transformers-training-ai-without-a-tokenizer">Byte-Latent Transformers: Training AI Without a Tokenizer</h1> <p>Every language model you’ve ever used — GPT-4, Claude, Gemini, LLaMA — starts with the same preprocessing step before a single parameter is touched.</p> <p>A <strong>tokenizer</strong> runs over your input and converts it into a sequence of integer IDs. <code class="language-plaintext highlighter-rouge">"Hello world"</code> becomes something like <code class="language-plaintext highlighter-rouge">[9906, 1917]</code>. The model never sees characters. It sees token IDs drawn from a fixed vocabulary, usually 32K to 128K entries, built offline by running BPE or SentencePiece on a large corpus.</p> <p>This has been the unquestioned default for five years.</p> <p>In late 2024, Meta AI published <strong>“Byte Latent Transformer: Patches Scale Better Than Tokens”</strong> — and questioned it.</p> <p>The core claim: you can train a competitive language model directly on raw bytes, no tokenizer required, and at the same compute budget it matches or beats LLaMA 3 on most benchmarks. On tasks that expose tokenization’s weaknesses — character manipulation, rare languages, structured data — it wins clearly.</p> <p>This post covers why tokenization has always been a compromise, how BLT replaces it, and why this architecture matters.</p> <hr> <h2 id="tldr">TL;DR</h2> <ul> <li>Tokenizers are a <strong>lossy, brittle preprocessing step</strong> baked into every modern LLM</li> <li>BLT processes <strong>raw bytes</strong> — no vocabulary, no OOV, no tokenization artifacts</li> <li>Groups bytes into <strong>variable-length patches</strong> based on information content (entropy)</li> <li>Architecture: Local Encoder → Latent Transformer → Local Decoder</li> <li> <strong>Matches LLaMA 3</strong> at equal FLOP budget; beats it on character-level tasks</li> <li>Especially strong on <strong>multilingual text, code, structured data, and novel formats</strong> </li> <li>Patches scale better than tokens as model size increases</li> </ul> <hr> <h2 id="the-tokenizer-problem">The Tokenizer Problem</h2> <p>Before explaining what BLT does, it’s worth being specific about what tokenizers get wrong.</p> <h3 id="problem-1-the-vocabulary-is-fixed-and-arbitrary">Problem 1: The Vocabulary Is Fixed and Arbitrary</h3> <p>BPE (Byte-Pair Encoding) builds a vocabulary by iteratively merging the most frequent character pairs in a training corpus. The result is deeply English-centric. Common English words get single tokens. Rare words, names, and most non-Latin scripts get shredded into fragments.</p> <p>The word <code class="language-plaintext highlighter-rouge">"unfortunately"</code> → 1 token. The Turkish word <code class="language-plaintext highlighter-rouge">"değiştiremeyebilirsiniz"</code> → 12+ tokens.</p> <p>Same information density, wildly different token cost. Multilingual models pay a massive efficiency penalty on non-English text simply because of vocabulary construction choices made before training started.</p> <h3 id="problem-2-tokenization-creates-invisible-bugs">Problem 2: Tokenization Creates Invisible Bugs</h3> <p>Because models operate on token IDs rather than characters, they have no direct access to spelling. This causes failures that look baffling from the outside:</p> <ul> <li> <code class="language-plaintext highlighter-rouge">9.11 &gt; 9.9</code> — GPT-4 originally said false. The numbers are tokenized as whole units; the model sees <code class="language-plaintext highlighter-rouge">9</code> and <code class="language-plaintext highlighter-rouge">.11</code> vs <code class="language-plaintext highlighter-rouge">9</code> and <code class="language-plaintext highlighter-rouge">.9</code> without clean positional structure.</li> <li>Reverse a string → often wrong, because reversing happens at the character level but the model thinks in tokens.</li> <li>Count the letter <code class="language-plaintext highlighter-rouge">r</code> in <code class="language-plaintext highlighter-rouge">"strawberry"</code> → famously hard for tokenized models, trivial for humans.</li> <li>Rhyming, anagram detection, wordplay → systematically poor.</li> </ul> <p>These aren’t reasoning failures. They’re tokenization artifacts.</p> <h3 id="problem-3-tokenization-is-brittle-at-boundaries">Problem 3: Tokenization Is Brittle at Boundaries</h3> <p>Adding a space changes the token. Capitalization changes the token. A URL with an unusual structure might produce a token sequence no model has seen during training. Code with uncommon variable names gets fragmented unpredictably.</p> <p>Models can recover from this because they have enough capacity to memorize patterns — but they’re burning parameters on compensating for preprocessing noise.</p> <h3 id="problem-4-the-vocabulary-cant-adapt">Problem 4: The Vocabulary Can’t Adapt</h3> <p>If a new domain emerges after the tokenizer is built — a new programming language, a new file format, a new script — the model handles it poorly. The vocabulary is frozen. There’s no mechanism to learn better representations for new patterns without retraining the tokenizer and rebuilding the vocabulary from scratch.</p> <hr> <h2 id="what-bytes-give-you">What Bytes Give You</h2> <p>At the other extreme: raw bytes.</p> <p>Every piece of digital information — text in any language, code, HTML, JSON, images, audio — can be represented as a sequence of bytes. A byte is a number from 0 to 255. There are exactly 256 possible values.</p> <p>A byte-level model has a vocabulary of 256. It never needs to be retrained. It never has an OOV (out-of-vocabulary) problem. Every string in any language on any format is representable without special handling.</p> <p>The catch: raw bytes produce very long sequences. <code class="language-plaintext highlighter-rouge">"Hello world"</code> is 11 bytes. A 10,000-word document is ~60,000 bytes. Transformers scale quadratically with sequence length — so naive byte-level transformers are expensive, slow, and don’t scale well.</p> <p>This is why the field defaulted to tokenization in the first place. Tokens compress the sequence. Shorter sequence → cheaper attention → more compute-efficient training.</p> <p>BLT’s contribution is solving the byte-length problem without reintroducing a fixed vocabulary.</p> <hr> <h2 id="the-blt-architecture">The BLT Architecture</h2> <p>BLT replaces the tokenizer with a learned, dynamic <strong>patching</strong> mechanism. Instead of a fixed vocabulary, it groups bytes into variable-length <strong>patches</strong> based on how predictable the bytes are.</p> <p>The full model has three components:</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Raw bytes
+    ↓
+Local Encoder  (lightweight byte-level transformer)
+    ↓
+Patch representations  (dynamic, variable-length groups)
+    ↓
+Latent Transformer  (large, expensive — operates on patches)
+    ↓
+Patch predictions
+    ↓
+Local Decoder  (reconstructs byte-level output from patches)
+    ↓
+Output bytes
+</code></pre></div></div> <h3 id="component-1-local-encoder">Component 1: Local Encoder</h3> <p>A small, lightweight transformer that reads raw bytes and produces byte-level representations. It doesn’t try to understand the whole document — it just builds local context around each byte.</p> <p>The output feeds into the patching step.</p> <h3 id="component-2-entropy-based-dynamic-patching">Component 2: Entropy-Based Dynamic Patching</h3> <p>This is the core idea. Instead of splitting text at fixed boundaries (like BPE does), BLT groups bytes into patches based on <strong>next-byte entropy</strong> — a measure of how surprising the next byte is.</p> <p>High entropy = the model is uncertain what comes next. This byte starts something complex. Start a new patch here.</p> <p>Low entropy = the next byte is predictable. This byte is part of a familiar pattern. Extend the current patch.</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Entropy-based patching example:
+
+Input:   " t h e   q u i c k   b r o w n   f o x "
+Entropy: [H  L  L  H  L  L  L  L  H  L  L  L  L  H  L  L  L]
+Patches: [_the] [_quick] [_brown] [_fox]
+</code></pre></div></div> <p>Common words and phrases get compressed into single patches. Rare words, code snippets, unusual names, and multilingual text get finer-grained patches — more attention per byte, exactly where it’s needed.</p> <p>This is the key insight: <strong>allocate compute proportional to information content</strong>. Predictable bytes get bundled cheaply. Surprising bytes get resolved carefully.</p> <p>The patch boundaries are dynamic — they change based on the actual input. A technical paper about nuclear physics gets different patches than a children’s story, even at the same byte length.</p> <h3 id="component-3-latent-transformer">Component 3: Latent Transformer</h3> <p>The main, expensive transformer. It operates on <strong>patch representations</strong>, not individual bytes. Because patches compress the sequence — typically by a factor of 4–8× compared to raw bytes — the latent transformer sees much shorter sequences.</p> <p>This is where the bulk of the model’s parameters live and where the “understanding” happens. It uses standard transformer architecture — multi-head attention, feed-forward layers — but on patch-level units.</p> <p>Critically, patch representations carry context from the Local Encoder via <strong>cross-attention</strong>. The latent transformer can look back at individual byte-level details when it needs to.</p> <h3 id="component-4-local-decoder">Component 4: Local Decoder</h3> <p>Reconstructs byte-level output from the patch-level predictions. Given a predicted patch, it generates the actual bytes that form the output — one byte at a time, conditioned on both the patch prediction and previously generated bytes.</p> <p>The decoder is also lightweight. Most of the compute stays in the Latent Transformer.</p> <hr> <h2 id="why-patches-scale-better-than-tokens">Why Patches Scale Better Than Tokens</h2> <p>The paper’s title makes a specific claim: <strong>patches scale better than tokens</strong>.</p> <p>Here’s the intuition.</p> <p>As models get larger, they get better at predicting common patterns — frequent words, standard syntax, typical phrases. With fixed tokenization, every token has the same representation cost regardless of how predictable it is. A token for <code class="language-plaintext highlighter-rouge">"the"</code> takes the same slot in the attention matrix as a token for <code class="language-plaintext highlighter-rouge">"Schrödinger"</code>.</p> <p>With entropy-based patching, as the model improves:</p> <ul> <li>More bytes become predictable → they get compressed into larger patches</li> <li>The effective sequence length decreases</li> <li>The same latent transformer capacity gets focused on harder problems</li> <li>Scaling the model → automatically better compression → more efficient use of compute</li> </ul> <p>This creates a virtuous loop that fixed tokenization can’t replicate. Tokenization is static — it doesn’t adapt to what the model has learned. BLT’s patching is dynamic — it improves with the model.</p> <p>The paper shows this empirically: at the same compute budget, BLT matches LLaMA 3. At larger scales, the efficiency gap favors BLT more.</p> <hr> <h2 id="where-blt-clearly-wins">Where BLT Clearly Wins</h2> <p>Some tasks are structurally impossible to do well with tokenized models. BLT handles all of them naturally.</p> <h3 id="character-level-manipulation">Character-Level Manipulation</h3> <p>Reverse a string, count specific characters, detect palindromes, anagram matching. BLT operates at the byte level — these tasks are as natural for it as scanning a character array is for you.</p> <h3 id="multilingual-text">Multilingual Text</h3> <p>No vocabulary bias. Turkish, Arabic, Hindi, Chinese, code-switching mid-sentence — all represented at the same byte-level granularity. No 10× token penalty for non-Latin scripts.</p> <h3 id="structured-formats">Structured Formats</h3> <p>JSON, CSV, XML, HTML, source code with unusual variable names — all handled without tokenization artifacts. The entropy-based patcher naturally segments these formats at structurally meaningful boundaries.</p> <h3 id="robustness-to-typos-and-noise">Robustness to Typos and Noise</h3> <p>A tokenizer turns a misspelled word into a completely different token sequence. BLT sees character-level corruption as a byte-level signal and can reason about it directly. This matters for real-world noisy input.</p> <h3 id="novel-formats-and-future-proofing">Novel Formats and Future-Proofing</h3> <p>A new programming language, a new markup format, a new domain — BLT handles it without retraining the vocabulary. There’s no concept of OOV. The 256-byte vocabulary is universal.</p> <hr> <h2 id="the-numbers">The Numbers</h2> <table> <thead> <tr> <th>Benchmark</th> <th>LLaMA 3 (tokens)</th> <th>BLT (bytes)</th> </tr> </thead> <tbody> <tr> <td>FLOP budget</td> <td>Matched</td> <td>Matched</td> </tr> <tr> <td>Overall performance</td> <td>Baseline</td> <td>Matches or beats</td> </tr> <tr> <td>Character tasks</td> <td>Weak</td> <td>Significantly better</td> </tr> <tr> <td>Multilingual</td> <td>Penalized by vocab</td> <td>Equal cost per byte</td> </tr> <tr> <td>Robustness</td> <td>Token-brittle</td> <td>Byte-robust</td> </tr> <tr> <td>Vocabulary size</td> <td>128K</td> <td>256 (universal)</td> </tr> <tr> <td>OOV handling</td> <td>Fragmentation</td> <td>None</td> </tr> </tbody> </table> <p>At equal compute: BLT is competitive. At tasks that expose tokenization’s weaknesses: BLT wins clearly.</p> <hr> <h2 id="what-blt-doesnt-solve">What BLT Doesn’t Solve</h2> <p>BLT is a compelling paper but not a solved problem.</p> <p><strong>Inference speed is still a challenge.</strong> The Local Encoder and Decoder add overhead at inference time that pure token-based models don’t have. The latent transformer may be cheaper due to shorter sequences, but the total wall-clock cost per output byte needs careful engineering.</p> <p><strong>The compression factor varies.</strong> On highly predictable text — boilerplate, repetitive formats — patches get large and the latent transformer gets efficient. On information-dense text like dense code or technical writing, patches stay small and the efficiency advantage shrinks.</p> <p><strong>Training stability at scale is unproven.</strong> The BLT paper demonstrates results up to a certain model size. Whether the architecture scales to 70B+ parameters with the same efficiency properties is an open question.</p> <p><strong>The field hasn’t adopted it yet.</strong> LLaMA 4, GPT-5, Gemini 2 all still use tokenizers. BLT is research. The engineering investment to replace tokenization infrastructure at production scale is non-trivial.</p> <hr> <h2 id="why-this-matters">Why This Matters</h2> <p>The reason BLT is interesting isn’t just the benchmarks.</p> <p>It’s that tokenization has been treated as an unquestioned given — an implementation detail inherited from the NLP of the early 2010s, carried forward because it worked well enough and changing it was hard.</p> <p>BLT demonstrates that the “work well enough” part was covering for real weaknesses, and that a principled alternative is achievable. It shows that you can beat a carefully tuned tokenized baseline without a fixed vocabulary, using only 256 byte values and a smarter way of grouping them.</p> <p>That’s a meaningful result even if BLT itself never ships in a production model.</p> <p>The broader lesson: <strong>the preprocessing stack is not fixed</strong>. Tokenization was an engineering convenience that became an invisible constraint. BLT makes the constraint visible — and shows a path around it.</p> <p>The next generation of models might not start by running your input through a frozen vocabulary lookup. They might start by reading bytes — the way your CPU always has.</p> <hr> <h2 id="further-reading">Further Reading</h2> <ul> <li> <a href="https://arxiv.org/abs/2412.09871" rel="external nofollow noopener" target="_blank">Byte Latent Transformer: Patches Scale Better Than Tokens</a> — Meta AI, 2024</li> <li><a href="https://huggingface.co/learn/nlp-course/chapter6/5" rel="external nofollow noopener" target="_blank">BPE tokenization explained — Hugging Face NLP Course</a></li> <li> <a href="https://arxiv.org/abs/2305.07185" rel="external nofollow noopener" target="_blank">MegaByte: Predicting Million-byte Sequences with Multiscale Transformers</a> — earlier byte-level work from Meta</li> <li> <a href="https://arxiv.org/abs/2105.13626" rel="external nofollow noopener" target="_blank">ByT5: Towards a Token-Free Future with Pre-trained Byte-to-Byte Models</a> — Google’s earlier byte model</li> </ul> </div> </article> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 Sai Sridhar Tarra. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank">al-folio</a> theme. </div> </footer> <script>
+  window.alFolio = {
+    compatBootstrap: false
+  };
+</script> <script src="/assets/js/nav-toggle.js?v=141bd79a73ebc0f0b6ea58e440ae79fc"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script> <script defer src="/assets/js/masonry.js?v=e49affc7bd2646f6acdad1dbe02c2359" type="text/javascript"></script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script> <script src="/assets/al_math/js/mathjax-setup.js"></script> <script defer src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6" crossorigin="anonymous"></script> <script src="/assets/js/tooltips-setup.js?v=fe487e99db6c43751e6e7bdb2d6a0611"></script> <script src="/assets/js/no_defer.js?v=53b1b1a645525975c963ce8bf8bfefcf"></script> <script defer src="/assets/js/common.js?v=87baac90f765f2f3362dcf6aaf312a8a"></script> <script defer src="/assets/js/copy_code.js?v=c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer src="/assets/js/jupyter_new_tab.js?v=896d254890d9b47f0281f63bfccf0dee"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous"></script> <script defer src="/assets/al_img_tools/js/zoom.js"></script> <script defer src="/assets/js/progress-bar.js?v=499464c5c63ced6cf7ad62509f1e2610" type="text/javascript"></script> <script src="https://cdn.jsdelivr.net/npm/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js" integrity="sha256-uMJJ3EoTyfRBoTbR+lrfu1uRQ87RZG8AR3cVNuQVeFg=" crossorigin="anonymous"></script> <script>
+    addBackToTop();
+  </script> <script type="module" src="/assets/al_search/js/search/ninja-keys.min.js"></script> <ninja-keys hidebreadcrumbs noautoloadmdicons placeholder="Type to start searching"></ninja-keys> <script src="/assets/al_search/js/search-setup.js"></script> <script>
+// get the ninja-keys element
+const ninja = document.querySelector('ninja-keys');
+
+// add the home and posts menu items
+ninja.data = [{
+    id: "nav-about",
+    title: "about",
+    section: "Navigation",
+    handler: () => {
+      window.location.href = "/";
+    },
+  },{id: "nav-blog",
+          title: "blog",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/blog/";
+          },
+        },{id: "nav-publications",
+          title: "publications",
+          description: "publications by categories in reversed chronological order. generated by jekyll-scholar.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/publications/";
+          },
+        },{id: "nav-projects",
+          title: "projects",
+          description: "A growing collection of your cool projects.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/projects/";
+          },
+        },{id: "nav-repositories",
+          title: "repositories",
+          description: "Edit the `_data/repositories.yml` and change the `github_users` and `github_repos` lists to include your own GitHub profile and repositories.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/repositories/";
+          },
+        },{id: "nav-cv",
+          title: "CV",
+          description: "This is a description of the page. You can modify it in '_pages/cv.md'. You can also change or remove the top pdf download button.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/cv/";
+          },
+        },{id: "nav-teaching",
+          title: "teaching",
+          description: "Course materials, schedules, and resources for classes taught.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/teaching/";
+          },
+        },{id: "nav-people",
+          title: "people",
+          description: "members of the lab or group",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/people/";
+          },
+        },{id: "dropdown-bookshelf",
+              title: "bookshelf",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/books/";
+              },
+            },{id: "dropdown-blog",
+              title: "blog",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/blog/";
+              },
+            },{id: "post-byte-latent-transformers-training-ai-without-a-tokenizer",
+        
+          title: "Byte-Latent Transformers: Training AI Without a Tokenizer",
+        
+        description: "Every LLM you've ever used runs on a tokenizer that chops text into chunks before the model sees a single character. Meta's Byte-Latent Transformer throws that away entirely — and matches LLaMA 3 performance. Here's how.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/byte-latent-transformers/";
+          
+        },
+      },{id: "post-hopfield-networks-modern-associative-memory-the-1982-idea-hidden-inside-every-transformer",
+        
+          title: "Hopfield Networks → Modern Associative Memory: The 1982 Idea Hidden Inside Every Transformer...",
+        
+        description: "A forgotten idea from 1982 about how brains store memories turned out to be the exact math behind transformer attention. Here's the full journey — from energy landscapes to softmax.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/hopfield-networks/";
+          
+        },
+      },{id: "post-kv-cache-compression-how-llms-handle-million-token-contexts-without-running-out-of-memory",
+        
+          title: "KV Cache Compression: How LLMs Handle Million-Token Contexts Without Running Out of Memory...",
+        
+        description: "Every token you generate costs memory — permanently. At 1M token contexts, the KV cache alone can consume 100GB+ of VRAM. Here's how modern LLMs compress it without losing what matters.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/kv-cache-compression/";
+          
+        },
+      },{id: "post-mcp-server-starter-build-tools-ai-agents-can-actually-use",
+        
+          title: "MCP Server Starter: Build Tools AI Agents Can Actually Use",
+        
+        description: "Most tutorials show you how to call an LLM. This one shows you how to build the server on the other side — the tool layer that AI agents call into. MCP in 30 lines of Python.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/mcp-server-starter/";
+          
+        },
+      },{id: "post-tribe-v2-and-the-rise-of-in-silico-neuroscience",
+        
+          title: "TRIBE v2 and the Rise of In-Silico Neuroscience",
+        
+        description: "What if you could simulate a neuroscience experiment before running it on a single human subject? TRIBE v2 — a tri-modal foundation model trained on 1,000+ hours of fMRI data — is making that real.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/tribe-v2-neuroscience/";
+          
+        },
+      },{id: "post-rag-beyond-naive-chunking-hyde-reranking-colbert-and-graph-rag",
+        
+          title: "RAG Beyond Naive Chunking: HyDE, Reranking, ColBERT, and Graph RAG",
+        
+        description: "Most RAG systems chunk documents, embed them, and call it a day. That's the floor, not the ceiling. Here's what production retrieval actually looks like — HyDE, late interaction, reranking pipelines, and knowledge graphs that reason over structure.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/rag-beyond-naive-chunking/";
+          
+        },
+      },{id: "post-mixture-of-experts-how-a-141b-model-runs-like-a-39b",
+        
+          title: "Mixture of Experts: How a 141B Model Runs Like a 39B",
+        
+        description: "GPT-4, Mixtral, and DeepSeek aren't the dense models most people imagine. They're sparse — activating only a fraction of their parameters per token. Here's the architecture that makes that possible, and why it changes everything about how we scale AI.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/mixture-of-experts/";
+          
+        },
+      },{id: "post-claude-mythos-anthropic-39-s-most-powerful-model-built-for-cybersecurity-not-for-everyone",
+        
+          title: "Claude Mythos: Anthropic's Most Powerful Model — Built for Cybersecurity, Not for Everyone...",
+        
+        description: "Anthropic just unveiled Claude Mythos Preview — a frontier model that autonomously finds zero-day vulnerabilities, outperforms every other Claude model on coding benchmarks, and is explicitly not available to the public. Here's everything you need to know about the most capable — and most restricted — AI model Anthropic has ever built.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/claude-mythos-cybersecurity/";
+          
+        },
+      },{id: "post-artemis-ii-humanity-39-s-return-to-the-moon-everything-that-has-happened-and-what-comes-next",
+        
+          title: "Artemis II: Humanity's Return to the Moon — Everything That Has Happened and...",
+        
+        description: "Artemis II is currently in flight — the first crewed mission beyond low Earth orbit since Apollo 17 in 1972. Here is a complete account of the mission, the crew, the records broken, and what comes next on humanity's road back to the Moon.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/artemis-2-mission/";
+          
+        },
+      },{id: "post-i-rebuilt-claude-code-in-go-works-offline-with-ollama-no-api-key-required",
+        
+          title: "I Rebuilt Claude Code in Go — Works Offline with Ollama, No API...",
+        
+        description: "After the Claude Code source leak revealed how agentic CLI tools are built, I reverse-engineered the core loop and rebuilt it from scratch in Go — with support for both Anthropic's API and fully offline Ollama models. Here's what I learned.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/forge-go-ai-agent/";
+          
+        },
+      },{id: "post-superposition-how-neural-networks-secretly-cram-more-concepts-than-they-have-neurons",
+        
+          title: "Superposition: How Neural Networks Secretly Cram More Concepts Than They Have Neurons",
+        
+        description: "Most engineers assume one neuron = one concept. They're wrong. Neural networks pack thousands of overlapping features into far fewer neurons using a trick from high-dimensional geometry — and understanding this changes everything about how we interpret AI.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/superposition-polysemanticity/";
+          
+        },
+      },{id: "post-understanding-transformers-the-architecture-behind-modern-ai",
+        
+          title: "Understanding Transformers: The Architecture Behind Modern AI",
+        
+        description: "A deep dive into the transformer architecture — the building block of GPT, BERT, and virtually every modern AI system. We'll implement multi-head attention from scratch.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2024/understanding-transformers/";
+          
+        },
+      },{id: "post-from-arima-to-lstm-choosing-the-right-model-for-time-series-forecasting",
+        
+          title: "From ARIMA to LSTM: Choosing the Right Model for Time-Series Forecasting",
+        
+        description: "A structured beginner-to-advanced guide to understanding ARIMA and LSTM models, how they work mathematically, and when to use each in real-world forecasting systems.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2024/arima-to-sarima/";
+          
+        },
+      },{id: "books-the-godfather",
+          title: 'The Godfather',
+          description: "",
+          section: "Books",handler: () => {
+              window.location.href = "/books/the_godfather/";
+            },},{id: "news-a-simple-inline-announcement",
+          title: 'A simple inline announcement.',
+          description: "",
+          section: "News",},{id: "news-a-long-announcement-with-details",
+          title: 'A long announcement with details',
+          description: "",
+          section: "News",handler: () => {
+              window.location.href = "/news/announcement_2/";
+            },},{id: "news-a-simple-inline-announcement-with-markdown-emoji-sparkles-smile",
+          title: 'A simple inline announcement with Markdown emoji! <img class="emoji" title=":sparkles:" alt=":sparkles:" src="https://github.githubassets.com/images/icons/emoji/unicode/2728.png" height="20" width="20"> <img class="emoji" title=":smile:" alt=":smile:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f604.png" height="20" width="20">',
+          description: "",
+          section: "News",},{id: "projects-demandcast",
+          title: 'DemandCast',
+          description: "Large-scale demand forecasting pipeline — LSTM with Temporal Attention achieving 22% lower MAPE across 50K+ products",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/1_demandcast/";
+            },},{id: "projects-mailair",
+          title: 'MailAir',
+          description: "AI-powered email assistant — LLMs + RAG auto-drafts replies, summarises threads, and prioritises your inbox",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/2_mailair/";
+            },},{id: "projects-skillswap",
+          title: 'SkillSwap',
+          description: "Peer-to-peer microlearning platform with credit-based economy, live WebRTC video sessions, and reputation tracking",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/3_skillswap/";
+            },},{id: "projects-explainable-stock-forecasting-engine",
+          title: 'Explainable Stock Forecasting Engine',
+          description: "Interpretable ML for stock price prediction with feature importance and model explanation techniques",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/4_stock_forecasting/";
+            },},{id: "projects-real-time-social-pulse-analyzer",
+          title: 'Real-Time Social Pulse Analyzer',
+          description: "Real-time trend detection and sentiment analysis from streaming social data using NLP",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/5_social_pulse/";
+            },},{id: "projects-adaptive-route-intelligence-engine",
+          title: 'Adaptive Route Intelligence Engine',
+          description: "High-performance real-time pathfinding using A* and Bidirectional Dijkstra algorithms in C++",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/6_route_intelligence/";
+            },},{id: "teachings-data-science-fundamentals",
+          title: 'Data Science Fundamentals',
+          description: "This course covers the foundational aspects of data science, including data collection, cleaning, analysis, and visualization. Students will learn practical skills for working with real-world datasets.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/data-science-fundamentals/";
+            },},{id: "teachings-introduction-to-machine-learning",
+          title: 'Introduction to Machine Learning',
+          description: "This course provides an introduction to machine learning concepts, algorithms, and applications. Students will learn about supervised and unsupervised learning, model evaluation, and practical implementations.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/introduction-to-machine-learning/";
+            },},{
+        id: 'social-cv',
+        title: 'CV',
+        section: 'Socials',
+        handler: () => {
+          window.open("/assets/pdf/resume.pdf", "_blank");
+        },
+      },{
+        id: 'social-email',
+        title: 'email',
+        section: 'Socials',
+        handler: () => {
+          window.open("mailto:%74%61%72%72%61%73%72%69%64%68%61%72%31%31%35%34@%67%6D%61%69%6C.%63%6F%6D", "_blank");
+        },
+      },{
+        id: 'social-rss',
+        title: 'RSS Feed',
+        section: 'Socials',
+        handler: () => {
+          window.open("/feed.xml", "_blank");
+        },
+      },{
+        id: 'social-github',
+        title: 'GitHub',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://github.com/sridhar-3009", "_blank");
+        },
+      },{
+        id: 'social-linkedin',
+        title: 'LinkedIn',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.linkedin.com/in/sai-sridhar-tarra-2a77561a2", "_blank");
+        },
+      },{
+        id: 'social-x',
+        title: 'X',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://twitter.com/sridhar_3009", "_blank");
+        },
+      },{
+      id: 'light-theme',
+      title: 'Change theme to light',
+      description: 'Change the theme of the site to Light',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("light");
+      },
+    },
+    {
+      id: 'dark-theme',
+      title: 'Change theme to dark',
+      description: 'Change the theme of the site to Dark',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("dark");
+      },
+    },
+    {
+      id: 'system-theme',
+      title: 'Use system default theme',
+      description: 'Change the theme of the site to System Default',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("system");
+      },
+    },];
+
+</script> <script src="/assets/al_search/js/shortcut-key.js"></script> </body> </html>

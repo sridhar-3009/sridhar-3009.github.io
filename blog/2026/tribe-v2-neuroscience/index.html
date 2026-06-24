@@ -1,0 +1,373 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <title> TRIBE v2 and the Rise of In-Silico Neuroscience | Sai Sridhar Tarra </title> <meta name="author" content="Sai Sridhar Tarra"> <meta name="description" content="What if you could simulate a neuroscience experiment before running it on a single human subject? TRIBE v2 — a tri-modal foundation model trained on 1,000+ hours of fMRI data — is making that real."> <meta name="keywords" content="machine learning, AI engineer, LLM, MLOps, NLP, portfolio, Sai Sridhar Tarra"> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <style>
+  :root {
+    --max-content-width: 930px;
+  }
+</style> <link rel="stylesheet" href="/assets/css/tailwind.css?v=50c64c15cbb9fd1ce6056fdb8bcb4b62"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.5/css/academicons.min.css" integrity="sha256-SzrCOBJbGVFMahewkgjwnApaV2+av1DwMAA+/QGLyZw=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/scholar-icons@1.0.3/css/scholar-icons.css" integrity="sha256-VY3hHVj/hNX3fYG6wtbA6TcKJQl7+FthzGSyIB64klY=" crossorigin="anonymous"> <link defer rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&amp;display=swap"> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-github.css?v=591dab5a4e56573bf4ef7fd332894c99" media="" id="highlight_theme_light"> <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%E2%9A%A1&lt;/text&gt;&lt;/svg&gt;"> <link rel="stylesheet" href="/assets/css/main.css?v=f0b101217084a90093badfe99ff9a7d1"> <link rel="canonical" href="https://sridhar-3009.github.io/blog/2026/tribe-v2-neuroscience/"> <script src="/assets/js/theme.js?v=7af685e2ba20b37fef545c97b8064050"></script> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-native.css?v=5847e5ed4a4568527aa6cfab446049ca" media="none" id="highlight_theme_dark"> <script>
+    initTheme();
+  </script> </head> <body class="fixed-top-nav "> <header> <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top" role="navigation"> <div class="container"> <a class="navbar-brand title font-weight-lighter" href="/"> Sai Sridhar Tarra </a> <button class="navbar-toggler collapsed navbar-toggler-main" type="button" data-nav-toggle="navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar top-bar"></span> <span class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span> </button> <div class="collapse navbar-collapse navbar-collapse-main" id="navbarNav"> <ul class="navbar-nav navbar-menu-list flex-nowrap"> <li class="nav-item "> <a class="nav-link" href="/">about </a> </li> <li class="nav-item active"> <a class="nav-link" href="/blog/">blog </a> </li> <li class="nav-item "> <a class="nav-link" href="/publications/">publications </a> </li> <li class="nav-item "> <a class="nav-link" href="/projects/">projects </a> </li> <li class="nav-item "> <a class="nav-link" href="/repositories/">repositories </a> </li> <li class="nav-item "> <a class="nav-link" href="/cv/">CV </a> </li> <li class="nav-item "> <a class="nav-link" href="/teaching/">teaching </a> </li> <li class="nav-item "> <a class="nav-link" href="/people/">people </a> </li> <li class="nav-item dropdown "> <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-nav-dropdown-toggle="true" aria-haspopup="true" aria-expanded="false">submenus </a> <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown"> <a class="dropdown-item " href="/books/">bookshelf</a> <div class="dropdown-divider"></div> <a class="dropdown-item " href="/blog/">blog</a> </div> </li> <li class="nav-item"> <button id="search-toggle" type="button" title="Search" aria-label="Open search"> <span class="nav-link">ctrl k <i class="fa-solid fa-magnifying-glass"></i></span> </button> </li> <li class="toggle-container"> <button id="light-toggle" type="button" title="Change theme" aria-label="Change color theme"> <i class="fa-half-sun-moon" id="light-toggle-system"></i> <i class="fa-solid fa-moon" id="light-toggle-dark"></i> <i class="fa-solid fa-sun" id="light-toggle-light"></i> </button> </li> </ul> </div> </div> </nav> <progress id="progress" value="0"> <div class="progress-container"> <span class="progress-bar"></span> </div> </progress> </header> <div class="container mt-5" role="main"> <div class="post"> <header class="post-header"> <h1 class="post-title">TRIBE v2 and the Rise of In-Silico Neuroscience</h1> <p class="post-meta"> Created on April 19, 2026 </p> <p class="post-tags"> <a href="/blog/2026"> <i class="fa-solid fa-calendar fa-sm"></i> 2026 </a>   ·   <a href="/blog/tag/neuroscience"> <i class="fa-solid fa-hashtag fa-sm"></i> Neuroscience</a>   <a href="/blog/tag/foundation-models"> <i class="fa-solid fa-hashtag fa-sm"></i> Foundation Models</a>   <a href="/blog/tag/multimodal"> <i class="fa-solid fa-hashtag fa-sm"></i> Multimodal</a>   <a href="/blog/tag/fmri"> <i class="fa-solid fa-hashtag fa-sm"></i> fMRI</a>   <a href="/blog/tag/transformers"> <i class="fa-solid fa-hashtag fa-sm"></i> Transformers</a>   <a href="/blog/tag/tribe-v2"> <i class="fa-solid fa-hashtag fa-sm"></i> TRIBE v2</a>   ·   <a href="/blog/category/ai-research"> <i class="fa-solid fa-tag fa-sm"></i> ai-research</a> </p> </header> <article class="post-content"> <div id="markdown-content"> <h1 id="tribe-v2-and-the-rise-of-in-silico-neuroscience">TRIBE v2 and the Rise of In-Silico Neuroscience</h1> <p>What if you could simulate a neuroscience experiment before running it on a single human subject?</p> <p>That’s the quiet but radical promise buried inside a recent paper: <strong>“A foundation model of vision, audition, and language for in-silico neuroscience.”</strong></p> <p>The model is called <strong>TRIBE v2</strong>. It takes video, audio, and text simultaneously, predicts whole-brain fMRI responses across 720 subjects and 1,000+ hours of data — and then, in its most striking result, <strong>reproduces classic neuroscience findings without running a single new human experiment.</strong></p> <p>That last part is what makes this paper worth a deep read.</p> <hr> <h2 id="tldr">TL;DR</h2> <ul> <li>TRIBE v2 is a <strong>tri-modal transformer</strong> that jointly models vision, hearing, and language to predict brain activity</li> <li>Trained on <strong>1,000+ hours of fMRI</strong> across <strong>720 subjects</strong> — one of the largest aggregations in brain modeling</li> <li>Beats strong linear baselines by learning <strong>nonlinear cross-modal interactions</strong> </li> <li>Generalizes <strong>zero-shot to unseen subjects</strong> — predicts group-level responses before any new data collection</li> <li>Reproduces <strong>FFA, PPA, EBA, VWFA</strong> and language network localizers <em>in silico</em> </li> <li>Hints at a new research workflow: <strong>simulate → refine → then scan</strong> </li> </ul> <hr> <h2 id="the-problem-with-how-neuroscience-is-done-today">The Problem With How Neuroscience Is Done Today</h2> <p>Most brain models are narrow by design.</p> <p>One model handles visual cortex. Another handles auditory cortex. A third tries to align language models with text-driven activity. Each is tuned to a specific task, dataset, and usually a handful of subjects.</p> <p>That fragmentation has produced real science — but it also creates a fundamental mismatch. The brain doesn’t process the world in academic silos. It watches, listens, reads, and integrates — simultaneously, continuously, in real time.</p> <p>Meanwhile, every new experiment still requires:</p> <ul> <li>Recruiting subjects</li> <li>Hours in the MRI scanner (at ~$700–1000/hour)</li> <li>Weeks of preprocessing and analysis</li> <li>And a lot of hope that the stimulus design actually works</li> </ul> <p>The field moves slowly because iteration is expensive. TRIBE v2 asks: what if a strong enough computational model could compress that loop?</p> <hr> <h2 id="what-tribe-v2-actually-is">What TRIBE v2 Actually Is</h2> <p>TRIBE v2 is built on a clean architectural principle: <strong>pretrained modality encoders already learned the world. Teach them to map into brain space.</strong></p> <p>Instead of handcrafting neuroscience-specific features, the authors take embeddings from state-of-the-art pretrained models for video, audio, and language. Those embeddings are time-synchronized, concatenated into a shared multimodal representation, and passed through a trainable transformer that predicts fMRI responses across the whole brain.</p> <p>The pipeline:</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Stimulus (video + audio + text)
+    ↓
+Pretrained modality encoders (separate per stream)
+    ↓
+Time-aligned multimodal embeddings
+    ↓
+Transformer brain encoder (the trainable part)
+    ↓
+Predicted whole-brain fMRI activity
+</code></pre></div></div> <p>This is a major shift from voxel-wise encoding pipelines — the standard approach — where researchers train separate linear models per subject, per task, and per brain region. TRIBE v2 learns one general model that handles all of them.</p> <hr> <h2 id="the-scale-that-makes-it-work">The Scale That Makes It Work</h2> <p>Scale is not a footnote here. It’s the foundation.</p> <table> <thead> <tr> <th>Dataset type</th> <th>Details</th> </tr> </thead> <tbody> <tr> <td>Total fMRI data</td> <td>1,000+ hours</td> </tr> <tr> <td>Subjects</td> <td>720 individuals</td> </tr> <tr> <td>Dataset types</td> <td>Deep (many sessions/subject) + Wide (many subjects, fewer sessions)</td> </tr> <tr> <td>Stimulus types</td> <td>Movies, podcasts, multimodal narratives</td> </tr> </tbody> </table> <p>Aggregating this much fragmented neuroscience data into one modeling setup is itself a contribution. No individual lab has collected anything close to this in one place.</p> <hr> <h2 id="what-it-actually-gets-right">What It Actually Gets Right</h2> <h3 id="modality-specific-structure-is-preserved">Modality-Specific Structure Is Preserved</h3> <p>When TRIBE v2 predicts brain responses to audio-heavy stimuli, activations peak in temporal auditory regions. For video-heavy stimuli, they peak in visual cortex. For multimodal inputs, predictions recruit broad cortical networks.</p> <p>That sounds like it should just work automatically — but it doesn’t in naive multimodal fusion. A poorly designed joint model blurs modality-specific responses into meaningless soup. The fact that TRIBE v2 preserves clean structure while still benefiting from cross-modal context is a meaningful result.</p> <h3 id="it-beats-linear-baselines--for-the-right-reason">It Beats Linear Baselines — For the Right Reason</h3> <p>The authors compare against <strong>Deep FIR</strong> — an optimized linear encoding pipeline using the <em>same pretrained embeddings</em>. This is the honest comparison. It isolates whether the transformer architecture is doing anything beyond better input features.</p> <p>It is. TRIBE v2 outperforms the linear baseline significantly across datasets, meaning the nonlinear cross-modal interactions are genuinely adding value — not just free-riding on stronger representations.</p> <h3 id="zero-shot-generalization-to-unseen-subjects">Zero-Shot Generalization to Unseen Subjects</h3> <p>This is the most practically significant result.</p> <p>TRIBE v2 can predict brain responses for <strong>participants it has never seen</strong>, in a zero-shot setting. For some datasets, its group-level predictions beat what you’d get from a typical individual subject measured against the cohort average.</p> <p>Think about what that enables:</p> <ul> <li>Pilot a stimulus design without any scanner time</li> <li>Identify whether a paradigm is likely to evoke the effect you’re looking for</li> <li>Pre-filter stimulus sets before committing to expensive data collection</li> </ul> <p>The model doesn’t replace human data. But it could front-load the iteration to before you collect any.</p> <h3 id="fine-tuning-closes-the-gap-fast">Fine-Tuning Closes the Gap Fast</h3> <p>With even a small amount of subject-specific data, fine-tuning improves performance substantially. The workflow mirrors what foundation models did for NLP and vision:</p> <ol> <li>Start with a broad pretrained brain model</li> <li>Collect a modest amount of new participant data</li> <li>Fine-tune lightly → get a personalized brain encoder</li> </ol> <p>No training from scratch. No waiting for a full dataset.</p> <hr> <h2 id="the-most-important-result-simulated-neuroscience-experiments">The Most Important Result: Simulated Neuroscience Experiments</h2> <p>Here’s where the paper earns its headline claim.</p> <p>The authors test whether TRIBE v2 can <strong>reproduce findings from classic neuroscience experiments</strong> using only synthetic model-generated predictions — no new human subjects, no scanner.</p> <h3 id="visual-localizers">Visual Localizers</h3> <p>They simulate visual functional localizer experiments using controlled categories: faces, places, bodies, written characters.</p> <p>TRIBE v2 recovers the expected brain regions:</p> <table> <thead> <tr> <th>Category</th> <th>Brain region recovered</th> </tr> </thead> <tbody> <tr> <td>Faces</td> <td>FFA — Fusiform Face Area</td> </tr> <tr> <td>Places</td> <td>PPA — Parahippocampal Place Area</td> </tr> <tr> <td>Bodies</td> <td>EBA — Extrastriate Body Area</td> </tr> <tr> <td>Words</td> <td>VWFA — Visual Word Form Area</td> </tr> </tbody> </table> <p>These are landmarks of cognitive neuroscience, established over decades of carefully controlled human experiments. A model reproducing them from simulated predictions is not just passing a benchmark — it’s demonstrating structural alignment with the field’s validated knowledge.</p> <h3 id="language-localizers">Language Localizers</h3> <p>The same approach extends to language. The model is tested on conditions designed to isolate language processing, and the predicted contrast maps align with known language network responses — even though language unfolds over time, interacts with audio, and depends on hierarchical syntactic structure.</p> <h3 id="why-this-is-the-most-important-part">Why This Is the Most Important Part</h3> <p>If in-silico experiments become reliable enough, neuroscience research gets a new design loop:</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Hypothesis
+    ↓
+Simulate expected brain response with a foundation model
+    ↓
+Refine stimulus or experimental protocol
+    ↓
+Run the expensive human experiment (now with higher confidence)
+</code></pre></div></div> <p>Every other field has a version of this. Aerospace has wind tunnels. Drug discovery has molecular simulations. Physics has lattice QCD. Neuroscience has mostly had the scanner and hope.</p> <p>TRIBE v2 is a first serious hint that computational simulation could become a standard upstream step in brain research.</p> <hr> <h2 id="what-the-learned-representations-look-like">What the Learned Representations Look Like</h2> <p>Using independent component analysis, the authors probe what the model’s latent space actually captures.</p> <p>The components align recognizably with:</p> <ul> <li>Auditory cortex</li> <li>Language network</li> <li>Motion-sensitive visual areas (MT+)</li> <li>Default mode network</li> </ul> <p>They also find something interesting: text-derived features dominate not just classical language areas but parts of <strong>prefrontal cortex</strong> too — suggesting that linguistic abstraction may provide a useful organizational scaffold for broader cognitive structure.</p> <p>That’s a scientific finding, not just a benchmark score.</p> <hr> <h2 id="the-limitations-worth-taking-seriously">The Limitations Worth Taking Seriously</h2> <p>The authors don’t oversell this. A few things to keep in mind:</p> <p><strong>TRIBE v2 models the brain as a passive observer.</strong> It predicts responses to stimuli. It says nothing about active decision-making, motor planning, or internally generated thought.</p> <p><strong>fMRI trades temporal resolution for spatial coverage.</strong> The model is trained on a signal that averages over 1–2 seconds of neural activity. Real brain computation is happening at milliseconds. That’s a massive compression.</p> <p><strong>Strong prediction ≠ mechanism.</strong> TRIBE v2 may be a very powerful statistical emulator of brain responses without capturing the true computational principles underneath. The map is not the territory.</p> <p><strong>Data diversity is still a gap.</strong> 720 subjects is large for neuroscience — but the population is still almost certainly skewed toward Western, educated, young, healthy adults. A “foundation model of the brain” is only as universal as the brains it was trained on.</p> <hr> <h2 id="why-the-architecture-choice-is-smart">Why the Architecture Choice Is Smart</h2> <p>TRIBE v2 does not try to reinvent the foundation-model stack for neuroscience. It borrows what already worked:</p> <ul> <li>Use large pretrained encoders for each modality</li> <li>Align them temporally</li> <li>Fuse with a trainable transformer</li> <li>Adapt final layers to the scientific target</li> </ul> <p>That’s pragmatic. The best audio, video, and language representations are already being learned at internet scale. Neuroscience doesn’t need to redo that. It just needs a bridge between those representations and brain space.</p> <p>From an engineering standpoint, this also explains why the model scales well. Once the modality encoders are strong, the remaining problem is multimodal integration, temporal aggregation, and subject-aware decoding — and transformers are already excellent at all three.</p> <hr> <h2 id="the-shift-this-paper-represents">The Shift This Paper Represents</h2> <p>The strongest papers don’t just improve a metric. They change the default question.</p> <p>Before work like this, the standard neuroscience framing was:</p> <blockquote> <p>“Can we build a model for this specific experiment?”</p> </blockquote> <p>After TRIBE v2, the framing becomes:</p> <blockquote> <p>“Can we build a general computational instrument that makes experiments better before we run them?”</p> </blockquote> <p>That is a more ambitious goal, and a more interesting one.</p> <p>Language models became interfaces to knowledge. Diffusion models became interfaces to visual generation. Foundation models like TRIBE v2 may become interfaces to <strong>hypothesis generation in neuroscience</strong> — a tool you run before you commit to months of experimental design.</p> <hr> <h2 id="final-thought">Final Thought</h2> <p>TRIBE v2 is not claiming to have solved the brain. It’s more honest than that.</p> <p>What it’s claiming — and largely demonstrating — is that a general-purpose model trained on enough multimodal brain data can do something genuinely new: simulate neuroscience before you run it.</p> <p>If that workflow matures, it could do for cognitive neuroscience what molecular simulation did for drug discovery and what CFD did for aerodynamics: compress the iteration cycle and expand the space of questions researchers can actually afford to ask.</p> <p>That’s worth paying attention to.</p> <hr> <h2 id="further-reading">Further Reading</h2> <ul> <li><a href="https://arxiv.org/abs/2411.10062" rel="external nofollow noopener" target="_blank">Paper: A foundation model of vision, audition, and language for in-silico neuroscience</a></li> <li><a href="http://algonauts.csail.mit.edu/" rel="external nofollow noopener" target="_blank">Algonauts Project — brain encoding challenges</a></li> <li><a href="https://naturalscenesdataset.org/" rel="external nofollow noopener" target="_blank">Natural Scenes Dataset — large-scale fMRI benchmark</a></li> </ul> </div> </article> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 Sai Sridhar Tarra. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank">al-folio</a> theme. </div> </footer> <script>
+  window.alFolio = {
+    compatBootstrap: false
+  };
+</script> <script src="/assets/js/nav-toggle.js?v=141bd79a73ebc0f0b6ea58e440ae79fc"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script> <script defer src="/assets/js/masonry.js?v=e49affc7bd2646f6acdad1dbe02c2359" type="text/javascript"></script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script> <script src="/assets/al_math/js/mathjax-setup.js"></script> <script defer src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6" crossorigin="anonymous"></script> <script src="/assets/js/tooltips-setup.js?v=fe487e99db6c43751e6e7bdb2d6a0611"></script> <script src="/assets/js/no_defer.js?v=53b1b1a645525975c963ce8bf8bfefcf"></script> <script defer src="/assets/js/common.js?v=87baac90f765f2f3362dcf6aaf312a8a"></script> <script defer src="/assets/js/copy_code.js?v=c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer src="/assets/js/jupyter_new_tab.js?v=896d254890d9b47f0281f63bfccf0dee"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous"></script> <script defer src="/assets/al_img_tools/js/zoom.js"></script> <script defer src="/assets/js/progress-bar.js?v=499464c5c63ced6cf7ad62509f1e2610" type="text/javascript"></script> <script src="https://cdn.jsdelivr.net/npm/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js" integrity="sha256-uMJJ3EoTyfRBoTbR+lrfu1uRQ87RZG8AR3cVNuQVeFg=" crossorigin="anonymous"></script> <script>
+    addBackToTop();
+  </script> <script type="module" src="/assets/al_search/js/search/ninja-keys.min.js"></script> <ninja-keys hidebreadcrumbs noautoloadmdicons placeholder="Type to start searching"></ninja-keys> <script src="/assets/al_search/js/search-setup.js"></script> <script>
+// get the ninja-keys element
+const ninja = document.querySelector('ninja-keys');
+
+// add the home and posts menu items
+ninja.data = [{
+    id: "nav-about",
+    title: "about",
+    section: "Navigation",
+    handler: () => {
+      window.location.href = "/";
+    },
+  },{id: "nav-blog",
+          title: "blog",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/blog/";
+          },
+        },{id: "nav-publications",
+          title: "publications",
+          description: "publications by categories in reversed chronological order. generated by jekyll-scholar.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/publications/";
+          },
+        },{id: "nav-projects",
+          title: "projects",
+          description: "A growing collection of your cool projects.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/projects/";
+          },
+        },{id: "nav-repositories",
+          title: "repositories",
+          description: "Edit the `_data/repositories.yml` and change the `github_users` and `github_repos` lists to include your own GitHub profile and repositories.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/repositories/";
+          },
+        },{id: "nav-cv",
+          title: "CV",
+          description: "This is a description of the page. You can modify it in '_pages/cv.md'. You can also change or remove the top pdf download button.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/cv/";
+          },
+        },{id: "nav-teaching",
+          title: "teaching",
+          description: "Course materials, schedules, and resources for classes taught.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/teaching/";
+          },
+        },{id: "nav-people",
+          title: "people",
+          description: "members of the lab or group",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/people/";
+          },
+        },{id: "dropdown-bookshelf",
+              title: "bookshelf",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/books/";
+              },
+            },{id: "dropdown-blog",
+              title: "blog",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/blog/";
+              },
+            },{id: "post-byte-latent-transformers-training-ai-without-a-tokenizer",
+        
+          title: "Byte-Latent Transformers: Training AI Without a Tokenizer",
+        
+        description: "Every LLM you've ever used runs on a tokenizer that chops text into chunks before the model sees a single character. Meta's Byte-Latent Transformer throws that away entirely — and matches LLaMA 3 performance. Here's how.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/byte-latent-transformers/";
+          
+        },
+      },{id: "post-hopfield-networks-modern-associative-memory-the-1982-idea-hidden-inside-every-transformer",
+        
+          title: "Hopfield Networks → Modern Associative Memory: The 1982 Idea Hidden Inside Every Transformer...",
+        
+        description: "A forgotten idea from 1982 about how brains store memories turned out to be the exact math behind transformer attention. Here's the full journey — from energy landscapes to softmax.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/hopfield-networks/";
+          
+        },
+      },{id: "post-kv-cache-compression-how-llms-handle-million-token-contexts-without-running-out-of-memory",
+        
+          title: "KV Cache Compression: How LLMs Handle Million-Token Contexts Without Running Out of Memory...",
+        
+        description: "Every token you generate costs memory — permanently. At 1M token contexts, the KV cache alone can consume 100GB+ of VRAM. Here's how modern LLMs compress it without losing what matters.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/kv-cache-compression/";
+          
+        },
+      },{id: "post-mcp-server-starter-build-tools-ai-agents-can-actually-use",
+        
+          title: "MCP Server Starter: Build Tools AI Agents Can Actually Use",
+        
+        description: "Most tutorials show you how to call an LLM. This one shows you how to build the server on the other side — the tool layer that AI agents call into. MCP in 30 lines of Python.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/mcp-server-starter/";
+          
+        },
+      },{id: "post-tribe-v2-and-the-rise-of-in-silico-neuroscience",
+        
+          title: "TRIBE v2 and the Rise of In-Silico Neuroscience",
+        
+        description: "What if you could simulate a neuroscience experiment before running it on a single human subject? TRIBE v2 — a tri-modal foundation model trained on 1,000+ hours of fMRI data — is making that real.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/tribe-v2-neuroscience/";
+          
+        },
+      },{id: "post-rag-beyond-naive-chunking-hyde-reranking-colbert-and-graph-rag",
+        
+          title: "RAG Beyond Naive Chunking: HyDE, Reranking, ColBERT, and Graph RAG",
+        
+        description: "Most RAG systems chunk documents, embed them, and call it a day. That's the floor, not the ceiling. Here's what production retrieval actually looks like — HyDE, late interaction, reranking pipelines, and knowledge graphs that reason over structure.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/rag-beyond-naive-chunking/";
+          
+        },
+      },{id: "post-mixture-of-experts-how-a-141b-model-runs-like-a-39b",
+        
+          title: "Mixture of Experts: How a 141B Model Runs Like a 39B",
+        
+        description: "GPT-4, Mixtral, and DeepSeek aren't the dense models most people imagine. They're sparse — activating only a fraction of their parameters per token. Here's the architecture that makes that possible, and why it changes everything about how we scale AI.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/mixture-of-experts/";
+          
+        },
+      },{id: "post-claude-mythos-anthropic-39-s-most-powerful-model-built-for-cybersecurity-not-for-everyone",
+        
+          title: "Claude Mythos: Anthropic's Most Powerful Model — Built for Cybersecurity, Not for Everyone...",
+        
+        description: "Anthropic just unveiled Claude Mythos Preview — a frontier model that autonomously finds zero-day vulnerabilities, outperforms every other Claude model on coding benchmarks, and is explicitly not available to the public. Here's everything you need to know about the most capable — and most restricted — AI model Anthropic has ever built.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/claude-mythos-cybersecurity/";
+          
+        },
+      },{id: "post-artemis-ii-humanity-39-s-return-to-the-moon-everything-that-has-happened-and-what-comes-next",
+        
+          title: "Artemis II: Humanity's Return to the Moon — Everything That Has Happened and...",
+        
+        description: "Artemis II is currently in flight — the first crewed mission beyond low Earth orbit since Apollo 17 in 1972. Here is a complete account of the mission, the crew, the records broken, and what comes next on humanity's road back to the Moon.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/artemis-2-mission/";
+          
+        },
+      },{id: "post-i-rebuilt-claude-code-in-go-works-offline-with-ollama-no-api-key-required",
+        
+          title: "I Rebuilt Claude Code in Go — Works Offline with Ollama, No API...",
+        
+        description: "After the Claude Code source leak revealed how agentic CLI tools are built, I reverse-engineered the core loop and rebuilt it from scratch in Go — with support for both Anthropic's API and fully offline Ollama models. Here's what I learned.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/forge-go-ai-agent/";
+          
+        },
+      },{id: "post-superposition-how-neural-networks-secretly-cram-more-concepts-than-they-have-neurons",
+        
+          title: "Superposition: How Neural Networks Secretly Cram More Concepts Than They Have Neurons",
+        
+        description: "Most engineers assume one neuron = one concept. They're wrong. Neural networks pack thousands of overlapping features into far fewer neurons using a trick from high-dimensional geometry — and understanding this changes everything about how we interpret AI.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/superposition-polysemanticity/";
+          
+        },
+      },{id: "post-understanding-transformers-the-architecture-behind-modern-ai",
+        
+          title: "Understanding Transformers: The Architecture Behind Modern AI",
+        
+        description: "A deep dive into the transformer architecture — the building block of GPT, BERT, and virtually every modern AI system. We'll implement multi-head attention from scratch.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2024/understanding-transformers/";
+          
+        },
+      },{id: "post-from-arima-to-lstm-choosing-the-right-model-for-time-series-forecasting",
+        
+          title: "From ARIMA to LSTM: Choosing the Right Model for Time-Series Forecasting",
+        
+        description: "A structured beginner-to-advanced guide to understanding ARIMA and LSTM models, how they work mathematically, and when to use each in real-world forecasting systems.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2024/arima-to-sarima/";
+          
+        },
+      },{id: "books-the-godfather",
+          title: 'The Godfather',
+          description: "",
+          section: "Books",handler: () => {
+              window.location.href = "/books/the_godfather/";
+            },},{id: "news-a-simple-inline-announcement",
+          title: 'A simple inline announcement.',
+          description: "",
+          section: "News",},{id: "news-a-long-announcement-with-details",
+          title: 'A long announcement with details',
+          description: "",
+          section: "News",handler: () => {
+              window.location.href = "/news/announcement_2/";
+            },},{id: "news-a-simple-inline-announcement-with-markdown-emoji-sparkles-smile",
+          title: 'A simple inline announcement with Markdown emoji! <img class="emoji" title=":sparkles:" alt=":sparkles:" src="https://github.githubassets.com/images/icons/emoji/unicode/2728.png" height="20" width="20"> <img class="emoji" title=":smile:" alt=":smile:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f604.png" height="20" width="20">',
+          description: "",
+          section: "News",},{id: "projects-demandcast",
+          title: 'DemandCast',
+          description: "Large-scale demand forecasting pipeline — LSTM with Temporal Attention achieving 22% lower MAPE across 50K+ products",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/1_demandcast/";
+            },},{id: "projects-mailair",
+          title: 'MailAir',
+          description: "AI-powered email assistant — LLMs + RAG auto-drafts replies, summarises threads, and prioritises your inbox",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/2_mailair/";
+            },},{id: "projects-skillswap",
+          title: 'SkillSwap',
+          description: "Peer-to-peer microlearning platform with credit-based economy, live WebRTC video sessions, and reputation tracking",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/3_skillswap/";
+            },},{id: "projects-explainable-stock-forecasting-engine",
+          title: 'Explainable Stock Forecasting Engine',
+          description: "Interpretable ML for stock price prediction with feature importance and model explanation techniques",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/4_stock_forecasting/";
+            },},{id: "projects-real-time-social-pulse-analyzer",
+          title: 'Real-Time Social Pulse Analyzer',
+          description: "Real-time trend detection and sentiment analysis from streaming social data using NLP",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/5_social_pulse/";
+            },},{id: "projects-adaptive-route-intelligence-engine",
+          title: 'Adaptive Route Intelligence Engine',
+          description: "High-performance real-time pathfinding using A* and Bidirectional Dijkstra algorithms in C++",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/6_route_intelligence/";
+            },},{id: "teachings-data-science-fundamentals",
+          title: 'Data Science Fundamentals',
+          description: "This course covers the foundational aspects of data science, including data collection, cleaning, analysis, and visualization. Students will learn practical skills for working with real-world datasets.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/data-science-fundamentals/";
+            },},{id: "teachings-introduction-to-machine-learning",
+          title: 'Introduction to Machine Learning',
+          description: "This course provides an introduction to machine learning concepts, algorithms, and applications. Students will learn about supervised and unsupervised learning, model evaluation, and practical implementations.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/introduction-to-machine-learning/";
+            },},{
+        id: 'social-cv',
+        title: 'CV',
+        section: 'Socials',
+        handler: () => {
+          window.open("/assets/pdf/resume.pdf", "_blank");
+        },
+      },{
+        id: 'social-email',
+        title: 'email',
+        section: 'Socials',
+        handler: () => {
+          window.open("mailto:%74%61%72%72%61%73%72%69%64%68%61%72%31%31%35%34@%67%6D%61%69%6C.%63%6F%6D", "_blank");
+        },
+      },{
+        id: 'social-rss',
+        title: 'RSS Feed',
+        section: 'Socials',
+        handler: () => {
+          window.open("/feed.xml", "_blank");
+        },
+      },{
+        id: 'social-github',
+        title: 'GitHub',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://github.com/sridhar-3009", "_blank");
+        },
+      },{
+        id: 'social-linkedin',
+        title: 'LinkedIn',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.linkedin.com/in/sai-sridhar-tarra-2a77561a2", "_blank");
+        },
+      },{
+        id: 'social-x',
+        title: 'X',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://twitter.com/sridhar_3009", "_blank");
+        },
+      },{
+      id: 'light-theme',
+      title: 'Change theme to light',
+      description: 'Change the theme of the site to Light',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("light");
+      },
+    },
+    {
+      id: 'dark-theme',
+      title: 'Change theme to dark',
+      description: 'Change the theme of the site to Dark',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("dark");
+      },
+    },
+    {
+      id: 'system-theme',
+      title: 'Use system default theme',
+      description: 'Change the theme of the site to System Default',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("system");
+      },
+    },];
+
+</script> <script src="/assets/al_search/js/shortcut-key.js"></script> </body> </html>

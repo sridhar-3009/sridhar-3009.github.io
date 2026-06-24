@@ -1,0 +1,504 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <title> Mixture of Experts: How a 141B Model Runs Like a 39B | Sai Sridhar Tarra </title> <meta name="author" content="Sai Sridhar Tarra"> <meta name="description" content="GPT-4, Mixtral, and DeepSeek aren't the dense models most people imagine. They're sparse — activating only a fraction of their parameters per token. Here's the architecture that makes that possible, and why it changes everything about how we scale AI."> <meta name="keywords" content="machine learning, AI engineer, LLM, MLOps, NLP, portfolio, Sai Sridhar Tarra"> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <style>
+  :root {
+    --max-content-width: 930px;
+  }
+</style> <link rel="stylesheet" href="/assets/css/tailwind.css?v=50c64c15cbb9fd1ce6056fdb8bcb4b62"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.5/css/academicons.min.css" integrity="sha256-SzrCOBJbGVFMahewkgjwnApaV2+av1DwMAA+/QGLyZw=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/scholar-icons@1.0.3/css/scholar-icons.css" integrity="sha256-VY3hHVj/hNX3fYG6wtbA6TcKJQl7+FthzGSyIB64klY=" crossorigin="anonymous"> <link defer rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&amp;display=swap"> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-github.css?v=591dab5a4e56573bf4ef7fd332894c99" media="" id="highlight_theme_light"> <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%E2%9A%A1&lt;/text&gt;&lt;/svg&gt;"> <link rel="stylesheet" href="/assets/css/main.css?v=f0b101217084a90093badfe99ff9a7d1"> <link rel="canonical" href="https://sridhar-3009.github.io/blog/2026/mixture-of-experts/"> <script src="/assets/js/theme.js?v=7af685e2ba20b37fef545c97b8064050"></script> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-native.css?v=5847e5ed4a4568527aa6cfab446049ca" media="none" id="highlight_theme_dark"> <script>
+    initTheme();
+  </script> </head> <body class="fixed-top-nav "> <header> <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top" role="navigation"> <div class="container"> <a class="navbar-brand title font-weight-lighter" href="/"> Sai Sridhar Tarra </a> <button class="navbar-toggler collapsed navbar-toggler-main" type="button" data-nav-toggle="navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar top-bar"></span> <span class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span> </button> <div class="collapse navbar-collapse navbar-collapse-main" id="navbarNav"> <ul class="navbar-nav navbar-menu-list flex-nowrap"> <li class="nav-item "> <a class="nav-link" href="/">about </a> </li> <li class="nav-item active"> <a class="nav-link" href="/blog/">blog </a> </li> <li class="nav-item "> <a class="nav-link" href="/publications/">publications </a> </li> <li class="nav-item "> <a class="nav-link" href="/projects/">projects </a> </li> <li class="nav-item "> <a class="nav-link" href="/repositories/">repositories </a> </li> <li class="nav-item "> <a class="nav-link" href="/cv/">CV </a> </li> <li class="nav-item "> <a class="nav-link" href="/teaching/">teaching </a> </li> <li class="nav-item "> <a class="nav-link" href="/people/">people </a> </li> <li class="nav-item dropdown "> <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-nav-dropdown-toggle="true" aria-haspopup="true" aria-expanded="false">submenus </a> <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown"> <a class="dropdown-item " href="/books/">bookshelf</a> <div class="dropdown-divider"></div> <a class="dropdown-item " href="/blog/">blog</a> </div> </li> <li class="nav-item"> <button id="search-toggle" type="button" title="Search" aria-label="Open search"> <span class="nav-link">ctrl k <i class="fa-solid fa-magnifying-glass"></i></span> </button> </li> <li class="toggle-container"> <button id="light-toggle" type="button" title="Change theme" aria-label="Change color theme"> <i class="fa-half-sun-moon" id="light-toggle-system"></i> <i class="fa-solid fa-moon" id="light-toggle-dark"></i> <i class="fa-solid fa-sun" id="light-toggle-light"></i> </button> </li> </ul> </div> </div> </nav> <progress id="progress" value="0"> <div class="progress-container"> <span class="progress-bar"></span> </div> </progress> </header> <div class="container mt-5" role="main"> <div class="post"> <header class="post-header"> <h1 class="post-title">Mixture of Experts: How a 141B Model Runs Like a 39B</h1> <p class="post-meta"> Created on April 16, 2026 </p> <p class="post-tags"> <a href="/blog/2026"> <i class="fa-solid fa-calendar fa-sm"></i> 2026 </a>   ·   <a href="/blog/tag/mixture-of-experts"> <i class="fa-solid fa-hashtag fa-sm"></i> Mixture of Experts</a>   <a href="/blog/tag/moe"> <i class="fa-solid fa-hashtag fa-sm"></i> MoE</a>   <a href="/blog/tag/mixtral"> <i class="fa-solid fa-hashtag fa-sm"></i> Mixtral</a>   <a href="/blog/tag/deepseek"> <i class="fa-solid fa-hashtag fa-sm"></i> DeepSeek</a>   <a href="/blog/tag/llms"> <i class="fa-solid fa-hashtag fa-sm"></i> LLMs</a>   <a href="/blog/tag/architecture"> <i class="fa-solid fa-hashtag fa-sm"></i> Architecture</a>   <a href="/blog/tag/pytorch"> <i class="fa-solid fa-hashtag fa-sm"></i> PyTorch</a>   ·   <a href="/blog/category/deep-learning"> <i class="fa-solid fa-tag fa-sm"></i> deep-learning</a> </p> </header> <article class="post-content"> <div id="markdown-content"> <h1 id="mixture-of-experts-how-a-141b-model-runs-like-a-39b">Mixture of Experts: How a 141B Model Runs Like a 39B</h1> <p>When Mistral released Mixtral 8x7B in December 2023, people were confused. The model card said 46.7B total parameters but only 12.9B active per token. How does a 46B model run at the speed of a 13B one?</p> <p>When DeepSeek-V3 launched in late 2024 with 671B total parameters but only 37B active, the confusion deepened. Numbers that large shouldn’t fit on any reasonable hardware — but they did.</p> <p>The answer is <strong>Mixture of Experts</strong> (MoE): a decades-old idea from the early 1990s that became the dominant architecture for frontier LLMs once engineers figured out how to make it work at scale.</p> <p>The core insight is almost offensively simple: <strong>you don’t need to run every part of the network on every input.</strong> Different tokens need different computations. A model smart enough to route each token to the relevant specialists — and ignore the rest — gets the knowledge of a huge model at the cost of a small one.</p> <p>This post goes deep on how that works: the router, the expert layers, the training tricks, and the engineering tradeoffs that make production MoE systems possible.</p> <hr> <h2 id="the-problem-with-dense-models">The Problem With Dense Models</h2> <p>In a standard transformer, every token passes through every parameter on every forward pass. A 70B dense model activates all 70B parameters for each token — a word in a poem, a number in an equation, a variable name in code. The model applies the full machinery regardless of whether it’s relevant.</p> <p>This is wasteful. A token in a Python function doesn’t need the same computations as a token in a French poem. The model’s knowledge of French grammar is entirely irrelevant when parsing <code class="language-plaintext highlighter-rouge">def forward(self, x):</code>.</p> <p>Dense scaling has another problem: <strong>compute scales with parameters</strong>. Double the parameters, roughly double the FLOPs per token. At some point, training cost becomes the bottleneck — not capability.</p> <p>MoE breaks this link between total parameters and per-token compute.</p> <hr> <h2 id="the-architecture-experts-replace-the-ffn">The Architecture: Experts Replace the FFN</h2> <p>In a standard transformer block, the feed-forward network (FFN) is the largest sub-component — typically 4× the model dimension, applied identically to every token.</p> <p>MoE replaces this single FFN with <code class="language-plaintext highlighter-rouge">N</code> independent FFNs — the <strong>experts</strong> — plus a lightweight <strong>router</strong> that selects which experts handle each token:</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Standard Transformer Block:
+  x → Self-Attention → Add &amp; Norm → FFN → Add &amp; Norm → output
+
+MoE Transformer Block:
+  x → Self-Attention → Add &amp; Norm → Router → Top-K Experts → Add &amp; Norm → output
+</code></pre></div></div> <p>The self-attention layers stay dense — every token attends to every other token. Only the FFN is replaced. This is the key design choice: attention handles context and relationships; experts handle token-level transformation.</p> <hr> <h2 id="the-router-making-the-decision">The Router: Making the Decision</h2> <p>The router is a small linear layer that maps each token’s hidden state to a probability distribution over experts:</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">torch</span>
+<span class="kn">import</span> <span class="n">torch.nn</span> <span class="k">as</span> <span class="n">nn</span>
+<span class="kn">import</span> <span class="n">torch.nn.functional</span> <span class="k">as</span> <span class="n">F</span>
+
+<span class="k">class</span> <span class="nc">MoERouter</span><span class="p">(</span><span class="n">nn</span><span class="p">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_experts</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="nf">super</span><span class="p">().</span><span class="nf">__init__</span><span class="p">()</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">num_experts</span> <span class="o">=</span> <span class="n">num_experts</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">top_k</span> <span class="o">=</span> <span class="n">top_k</span>
+
+        <span class="c1"># A single linear layer: hidden_dim → num_experts logits
+</span>        <span class="n">self</span><span class="p">.</span><span class="n">gate</span> <span class="o">=</span> <span class="n">nn</span><span class="p">.</span><span class="nc">Linear</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">num_experts</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sh">"""</span><span class="s">
+        x: (batch_size * seq_len, hidden_dim)
+        Returns:
+            top_k_indices:  (batch_size * seq_len, top_k)  — which experts to use
+            top_k_weights:  (batch_size * seq_len, top_k)  — how much to weight each
+        </span><span class="sh">"""</span>
+        <span class="c1"># Compute logits over all experts
+</span>        <span class="n">logits</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">gate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>                          <span class="c1"># (tokens, num_experts)
+</span>
+        <span class="c1"># Softmax to get routing probabilities
+</span>        <span class="n">probs</span> <span class="o">=</span> <span class="n">F</span><span class="p">.</span><span class="nf">softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>              <span class="c1"># (tokens, num_experts)
+</span>
+        <span class="c1"># Select top-K experts per token
+</span>        <span class="n">top_k_weights</span><span class="p">,</span> <span class="n">top_k_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">topk</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">top_k</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Renormalize so selected weights sum to 1
+</span>        <span class="n">top_k_weights</span> <span class="o">=</span> <span class="n">top_k_weights</span> <span class="o">/</span> <span class="n">top_k_weights</span><span class="p">.</span><span class="nf">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">top_k_indices</span><span class="p">,</span> <span class="n">top_k_weights</span>
+</code></pre></div></div> <p>For each token, the router outputs two things: <strong>which K experts to use</strong>, and <strong>how much weight to give each one</strong>. The final output is a weighted sum of those K experts’ outputs.</p> <p>Typical values: <code class="language-plaintext highlighter-rouge">num_experts = 8</code>, <code class="language-plaintext highlighter-rouge">top_k = 2</code>. So each token uses exactly 2 of 8 experts — activating 25% of the expert parameters.</p> <hr> <h2 id="the-expert-just-an-ffn">The Expert: Just an FFN</h2> <p>Each expert is a standard feed-forward network — nothing exotic:</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Expert</span><span class="p">(</span><span class="n">nn</span><span class="p">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ffn_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="nf">super</span><span class="p">().</span><span class="nf">__init__</span><span class="p">()</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">nn</span><span class="p">.</span><span class="nc">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="p">.</span><span class="nc">Linear</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">ffn_dim</span><span class="p">),</span>
+            <span class="n">nn</span><span class="p">.</span><span class="nc">SiLU</span><span class="p">(),</span>               <span class="c1"># SwiGLU variant used in Mixtral
+</span>            <span class="n">nn</span><span class="p">.</span><span class="nc">Linear</span><span class="p">(</span><span class="n">ffn_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">self</span><span class="p">.</span><span class="nf">net</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</code></pre></div></div> <p>The size of each expert’s FFN is typically the same as the FFN in a comparable dense model. So Mixtral 8x7B has 8 experts, each the size of a 7B model’s FFN — but only 2 are active per token. The “8x7B” name reflects this: 8 experts, each ~7B FFN scale.</p> <hr> <h2 id="putting-it-together-the-moe-layer">Putting It Together: The MoE Layer</h2> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">MoELayer</span><span class="p">(</span><span class="n">nn</span><span class="p">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ffn_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_experts</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="nf">super</span><span class="p">().</span><span class="nf">__init__</span><span class="p">()</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">num_experts</span> <span class="o">=</span> <span class="n">num_experts</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">top_k</span> <span class="o">=</span> <span class="n">top_k</span>
+
+        <span class="n">self</span><span class="p">.</span><span class="n">router</span> <span class="o">=</span> <span class="nc">MoERouter</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">num_experts</span><span class="p">,</span> <span class="n">top_k</span><span class="p">)</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">experts</span> <span class="o">=</span> <span class="n">nn</span><span class="p">.</span><span class="nc">ModuleList</span><span class="p">([</span>
+            <span class="nc">Expert</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">ffn_dim</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">num_experts</span><span class="p">)</span>
+        <span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sh">"""</span><span class="s">
+        x: (batch_size, seq_len, hidden_dim)
+        </span><span class="sh">"""</span>
+        <span class="n">B</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">x</span><span class="p">.</span><span class="n">shape</span>
+
+        <span class="c1"># Flatten to (batch*seq, hidden) — router operates per token
+</span>        <span class="n">x_flat</span> <span class="o">=</span> <span class="n">x</span><span class="p">.</span><span class="nf">view</span><span class="p">(</span><span class="n">B</span> <span class="o">*</span> <span class="n">S</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span>
+
+        <span class="c1"># Get routing decisions
+</span>        <span class="n">expert_indices</span><span class="p">,</span> <span class="n">expert_weights</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">router</span><span class="p">(</span><span class="n">x_flat</span><span class="p">)</span>
+        <span class="c1"># expert_indices:  (B*S, top_k)
+</span>        <span class="c1"># expert_weights:  (B*S, top_k)
+</span>
+        <span class="c1"># Collect expert outputs
+</span>        <span class="n">output</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">zeros_like</span><span class="p">(</span><span class="n">x_flat</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">top_k</span><span class="p">):</span>
+            <span class="c1"># Which tokens go to this slot's expert?
+</span>            <span class="n">indices</span> <span class="o">=</span> <span class="n">expert_indices</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span>      <span class="c1"># (B*S,) — expert index per token
+</span>            <span class="n">weights</span> <span class="o">=</span> <span class="n">expert_weights</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span>      <span class="c1"># (B*S,) — weight per token
+</span>
+            <span class="c1"># Process each expert's assigned tokens
+</span>            <span class="k">for</span> <span class="n">expert_id</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">num_experts</span><span class="p">):</span>
+                <span class="n">token_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">indices</span> <span class="o">==</span> <span class="n">expert_id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">token_mask</span><span class="p">.</span><span class="nf">any</span><span class="p">():</span>
+                    <span class="k">continue</span>
+
+                <span class="n">expert_input</span> <span class="o">=</span> <span class="n">x_flat</span><span class="p">[</span><span class="n">token_mask</span><span class="p">]</span>
+                <span class="n">expert_output</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">experts</span><span class="p">[</span><span class="n">expert_id</span><span class="p">](</span><span class="n">expert_input</span><span class="p">)</span>
+
+                <span class="c1"># Weighted accumulation
+</span>                <span class="n">output</span><span class="p">[</span><span class="n">token_mask</span><span class="p">]</span> <span class="o">+=</span> <span class="n">weights</span><span class="p">[</span><span class="n">token_mask</span><span class="p">].</span><span class="nf">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">expert_output</span>
+
+        <span class="k">return</span> <span class="n">output</span><span class="p">.</span><span class="nf">view</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span>
+</code></pre></div></div> <p>This is the naive implementation — readable but slow. Production systems batch all tokens destined for the same expert together (a single large matmul instead of a loop), which is why MoE requires specialized CUDA kernels in practice.</p> <hr> <h2 id="the-load-balancing-problem">The Load Balancing Problem</h2> <p>Here’s the failure mode that makes MoE training notoriously tricky: <strong>expert collapse</strong>.</p> <p>Without any intervention, the router quickly learns to always route tokens to the same 1–2 experts. Those experts see more gradients, get better faster, and attract even more tokens. The remaining experts starve — they’re never trained because tokens never reach them. You end up with a 141B model that effectively uses 10B parameters.</p> <p>The standard fix is an <strong>auxiliary load balancing loss</strong> that penalizes unequal expert utilization:</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">load_balancing_loss</span><span class="p">(</span><span class="n">router_probs</span><span class="p">,</span> <span class="n">expert_indices</span><span class="p">,</span> <span class="n">num_experts</span><span class="p">):</span>
+    <span class="sh">"""</span><span class="s">
+    Encourages uniform distribution of tokens across experts.
+
+    router_probs:   (num_tokens, num_experts) — softmax output of router
+    expert_indices: (num_tokens, top_k)       — selected expert indices
+    </span><span class="sh">"""</span>
+    <span class="n">num_tokens</span> <span class="o">=</span> <span class="n">router_probs</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Fraction of tokens routed to each expert
+</span>    <span class="c1"># (how often each expert is selected)
+</span>    <span class="n">one_hot</span> <span class="o">=</span> <span class="n">F</span><span class="p">.</span><span class="nf">one_hot</span><span class="p">(</span><span class="n">expert_indices</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="n">num_experts</span><span class="p">).</span><span class="nf">float</span><span class="p">()</span>
+    <span class="n">tokens_per_expert</span> <span class="o">=</span> <span class="n">one_hot</span><span class="p">.</span><span class="nf">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">).</span><span class="nf">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># (num_experts,)
+</span>    <span class="n">f</span> <span class="o">=</span> <span class="n">tokens_per_expert</span> <span class="o">/</span> <span class="n">tokens_per_expert</span><span class="p">.</span><span class="nf">sum</span><span class="p">()</span>
+
+    <span class="c1"># Average router probability assigned to each expert
+</span>    <span class="c1"># (how confident the router is about each expert)
+</span>    <span class="n">p</span> <span class="o">=</span> <span class="n">router_probs</span><span class="p">.</span><span class="nf">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># (num_experts,)
+</span>
+    <span class="c1"># Loss = num_experts * sum(f_i * p_i)
+</span>    <span class="c1"># Minimized when both f and p are uniform (1/num_experts each)
+</span>    <span class="n">loss</span> <span class="o">=</span> <span class="n">num_experts</span> <span class="o">*</span> <span class="p">(</span><span class="n">f</span> <span class="o">*</span> <span class="n">p</span><span class="p">).</span><span class="nf">sum</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">loss</span>
+</code></pre></div></div> <p>This loss is added to the main language modeling loss with a small coefficient (typically <code class="language-plaintext highlighter-rouge">α = 0.01</code>). It gently pushes the router toward distributing tokens evenly without overwhelming the task objective.</p> <hr> <h2 id="expert-capacity-the-traffic-problem">Expert Capacity: The Traffic Problem</h2> <p>Even with load balancing, real deployments face a harder constraint: <strong>expert capacity</strong>.</p> <p>In distributed training, each expert lives on a specific device. If 1000 tokens all want expert #3 and only 100 want expert #7, expert #3’s device is overwhelmed while #7’s sits idle. You can’t dynamically resize — the devices are fixed.</p> <p>The solution is a <strong>capacity factor</strong>: set a maximum number of tokens each expert can process per forward pass. Tokens that exceed an expert’s capacity are <strong>dropped</strong> — they don’t get processed by any expert.</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">route_with_capacity</span><span class="p">(</span><span class="n">router_probs</span><span class="p">,</span> <span class="n">top_k</span><span class="p">,</span> <span class="n">capacity_factor</span><span class="o">=</span><span class="mf">1.25</span><span class="p">):</span>
+    <span class="sh">"""</span><span class="s">
+    Routes tokens to experts with a hard capacity ceiling.
+    Excess tokens are dropped (their expert output is zeroed out).
+    </span><span class="sh">"""</span>
+    <span class="n">num_tokens</span><span class="p">,</span> <span class="n">num_experts</span> <span class="o">=</span> <span class="n">router_probs</span><span class="p">.</span><span class="n">shape</span>
+    <span class="c1"># Max tokens any single expert will process
+</span>    <span class="n">capacity</span> <span class="o">=</span> <span class="nf">int</span><span class="p">(</span><span class="n">capacity_factor</span> <span class="o">*</span> <span class="n">num_tokens</span> <span class="o">*</span> <span class="n">top_k</span> <span class="o">/</span> <span class="n">num_experts</span><span class="p">)</span>
+
+    <span class="n">top_k_weights</span><span class="p">,</span> <span class="n">top_k_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">topk</span><span class="p">(</span><span class="n">router_probs</span><span class="p">,</span> <span class="n">top_k</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">top_k_weights</span> <span class="o">=</span> <span class="n">top_k_weights</span> <span class="o">/</span> <span class="n">top_k_weights</span><span class="p">.</span><span class="nf">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="c1"># Track how many tokens each expert has accepted
+</span>    <span class="n">expert_counts</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">zeros</span><span class="p">(</span><span class="n">num_experts</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="nb">long</span><span class="p">)</span>
+    <span class="n">dispatch_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">zeros</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">,</span> <span class="n">top_k</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="nb">bool</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">token_idx</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">num_tokens</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">top_k</span><span class="p">):</span>
+            <span class="n">expert_id</span> <span class="o">=</span> <span class="n">top_k_indices</span><span class="p">[</span><span class="n">token_idx</span><span class="p">,</span> <span class="n">k</span><span class="p">].</span><span class="nf">item</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">expert_counts</span><span class="p">[</span><span class="n">expert_id</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">capacity</span><span class="p">:</span>
+                <span class="n">dispatch_mask</span><span class="p">[</span><span class="n">token_idx</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">expert_counts</span><span class="p">[</span><span class="n">expert_id</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c1"># else: token is dropped for this expert slot
+</span>
+    <span class="k">return</span> <span class="n">top_k_indices</span><span class="p">,</span> <span class="n">top_k_weights</span><span class="p">,</span> <span class="n">dispatch_mask</span>
+</code></pre></div></div> <p>Token dropping introduces a tricky training dynamic: the model must learn to be robust to occasionally missing expert outputs. In practice, capacity factor ~1.25 means ~2–5% of tokens get dropped — small enough that the model learns to tolerate it.</p> <hr> <h2 id="how-mixtral-does-it">How Mixtral Does It</h2> <p>Mixtral 8x7B uses 8 experts per MoE layer with top-2 routing. Every other transformer layer is an MoE layer (the rest are standard dense attention + FFN). The architecture:</p> <table> <thead> <tr> <th>Property</th> <th>Value</th> </tr> </thead> <tbody> <tr> <td>Total parameters</td> <td>46.7B</td> </tr> <tr> <td>Active parameters per token</td> <td>12.9B</td> </tr> <tr> <td>Experts per MoE layer</td> <td>8</td> </tr> <tr> <td>Active experts per token</td> <td>2</td> </tr> <tr> <td>Hidden dimension</td> <td>4096</td> </tr> <tr> <td>Expert FFN dimension</td> <td>14336</td> </tr> <tr> <td>Layers</td> <td>32 (alternating dense/MoE)</td> </tr> </tbody> </table> <p>The critical insight: <strong>attention layers are dense</strong> (all 12.9B active parameters), but the expert FFNs represent the bulk of “knowledge storage” — and only 2/8 = 25% of that storage is accessed per token.</p> <p>Mixtral’s routing is <strong>token-level, not sequence-level</strong>: the same word in different contexts can be routed to completely different experts. The router makes a fresh decision every token, every layer.</p> <hr> <h2 id="how-deepseek-pushes-it-further">How DeepSeek Pushes It Further</h2> <p>DeepSeek-V3 (671B total / 37B active) introduces two innovations beyond standard MoE:</p> <p><strong>1. Fine-Grained Expert Segmentation</strong></p> <p>Instead of 8 large experts, DeepSeek uses 256 small experts per layer with top-8 routing. Each expert is ~1/32 the size of a Mixtral expert. This gives the router much finer-grained control — you can build any “combination” of specializations rather than picking from 8 coarse buckets.</p> <p><strong>2. Shared Experts</strong></p> <p>DeepSeek designates a small number of experts as <strong>always-active shared experts</strong>. Every token passes through these, regardless of routing. The shared experts handle common, general-purpose transformations; the routed experts handle token-specific specialization.</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>DeepSeek MoE Layer:
+  token → [Shared Expert 1] ──────────────────────────────┐
+         → [Shared Expert 2] ──────────────────────────────┤
+         → Router → Top-K from 256 routed experts ─────────┴→ sum → output
+</code></pre></div></div> <p>This hybrid approach lets the model separate “what every token needs” from “what this specific token needs” — a cleaner decomposition than pure routing.</p> <hr> <h2 id="why-gpt-4-is-probably-moe">Why GPT-4 Is (Probably) MoE</h2> <p>OpenAI has never confirmed GPT-4’s architecture. But the evidence is strong:</p> <ul> <li>Sam Altman confirmed GPT-4 cost ~$100M to train — consistent with MoE (you can train more total parameters for the same FLOP budget)</li> <li>Multiple credible leaks from 2023 describe GPT-4 as a ~1.8T parameter MoE with 16 experts, top-2 routing</li> <li>GPT-4’s inference latency and throughput numbers are inconsistent with a single dense model at that capability level</li> <li>OpenAI’s research trajectory — from GPT-3 (dense) through the sparse attention work — pointed toward MoE</li> </ul> <p>The economics make it inevitable: a 1.8T MoE with 2/16 active experts costs the same to run as a ~200B dense model, but has the knowledge capacity of a 1.8T one. At frontier scale, there’s no competitive reason to use dense.</p> <hr> <h2 id="the-real-cost-communication-overhead">The Real Cost: Communication Overhead</h2> <p>MoE sounds like a free lunch. It isn’t. The hidden cost is <strong>all-to-all communication</strong>.</p> <p>In distributed training, model parameters are split across devices (tensor parallelism) or layers (pipeline parallelism). With MoE, you add a third dimension: <strong>expert parallelism</strong> — each expert lives on a different device.</p> <p>This creates a routing problem at the hardware level: after the router decides which expert each token goes to, you have to physically ship that token’s activations to the device that holds the relevant expert. After the expert processes it, the results ship back.</p> <p>This <strong>all-to-all collective</strong> — where every device sends data to every other device — is expensive on current hardware. The NVLink bandwidth between GPUs is fast, but not free. At the scale of 256 experts across 32 nodes, this communication can dominate training time.</p> <p>DeepSeek’s engineering contribution (described in their training paper) is a custom all-to-all kernel that overlaps communication with computation — hiding the latency by starting the next layer’s attention while the current layer’s expert results are still in transit. This is where the real engineering work happens in production MoE systems.</p> <hr> <h2 id="dense-vs-sparse-when-to-use-which">Dense vs. Sparse: When to Use Which</h2> <table> <thead> <tr> <th> </th> <th>Dense</th> <th>MoE</th> </tr> </thead> <tbody> <tr> <td>Training FLOPs per token</td> <td>High</td> <td>Low</td> </tr> <tr> <td>Inference FLOPs per token</td> <td>High</td> <td>Low</td> </tr> <tr> <td>Memory (weights)</td> <td>Low</td> <td>High</td> </tr> <tr> <td>Training stability</td> <td>High</td> <td>Moderate (needs load balancing)</td> </tr> <tr> <td>Serving complexity</td> <td>Simple</td> <td>Complex (expert parallelism)</td> </tr> <tr> <td>Good for</td> <td>Smaller models, simple serving</td> <td>Frontier scale, research</td> </tr> <tr> <td>Bad for</td> <td>Frontier scale (too expensive)</td> <td>Edge/mobile deployment</td> </tr> </tbody> </table> <p>The crossover point is roughly 30–70B parameters: below that, dense is simpler and sufficient; above that, MoE becomes the only economically viable path to higher capability.</p> <hr> <h2 id="key-takeaways">Key Takeaways</h2> <ol> <li> <p><strong>MoE breaks the compute-parameter link</strong> — you can have 10× more parameters for the same per-token FLOPs, because only a fraction of experts activate per token.</p> </li> <li> <p><strong>The router is a learned function</strong> — it figures out which tokens need which specializations entirely from gradient descent, with no human-defined expert roles.</p> </li> <li> <p><strong>Load balancing is non-negotiable</strong> — without the auxiliary loss, expert collapse happens within the first few thousand steps.</p> </li> <li> <p><strong>Expert capacity introduces token dropping</strong> — a necessary engineering compromise for distributed training that the model learns to tolerate.</p> </li> <li> <p><strong>DeepSeek’s fine-grained + shared expert design is the current state of the art</strong> — more routing flexibility, cleaner separation of general vs. specialized computation.</p> </li> <li> <p><strong>The real cost is communication, not compute</strong> — building production MoE systems is a distributed systems problem as much as an ML problem.</p> </li> </ol> <hr> <h2 id="further-reading">Further Reading</h2> <h3 id="foundational-papers">Foundational Papers</h3> <ul> <li> <p><strong><a href="https://arxiv.org/abs/1701.06538" rel="external nofollow noopener" target="_blank">Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer</a></strong> — Shazeer et al., Google Brain (2017) The paper that revived MoE for deep learning. Introduced the top-K gating mechanism and the load balancing auxiliary loss. Everything since builds on this.</p> </li> <li> <p><strong><a href="https://arxiv.org/abs/2101.03961" rel="external nofollow noopener" target="_blank">Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity</a></strong> — Fedus et al., Google (2021) Simplified MoE to top-1 routing, showed you could scale to 1T+ parameters. First clear demonstration that MoE could match dense models at trillion-parameter scale.</p> </li> <li> <p><strong><a href="https://arxiv.org/abs/2112.06905" rel="external nofollow noopener" target="_blank">GLaM: Efficient Scaling of Language Models with Mixture-of-Experts</a></strong> — Du et al., Google (2021) Trained a 1.2T MoE model using 1/3 the energy of GPT-3 training. Landmark result on MoE efficiency vs. dense models.</p> </li> </ul> <h3 id="modern-moe-architectures">Modern MoE Architectures</h3> <ul> <li> <p><strong><a href="https://arxiv.org/abs/2401.04088" rel="external nofollow noopener" target="_blank">Mixtral of Experts</a></strong> — Jiang et al., Mistral AI (2024) The architecture paper behind Mixtral 8x7B and 8x22B. Clean, readable description of token-level routing with top-2 selection. The open-source MoE baseline.</p> </li> <li> <p><strong><a href="https://arxiv.org/abs/2412.19437" rel="external nofollow noopener" target="_blank">DeepSeek-V3 Technical Report</a></strong> — DeepSeek AI (2024) 671B parameters, 37B active, trained for ~$5.5M. Describes fine-grained expert segmentation, shared experts, and the custom all-to-all communication kernel. State of the art in MoE efficiency.</p> </li> <li> <p><strong><a href="https://arxiv.org/abs/2405.04434" rel="external nofollow noopener" target="_blank">DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model</a></strong> — DeepSeek AI (2024) Predecessor to V3. Introduces the DeepSeekMoE architecture — the fine-grained + shared expert design — and validates it at scale.</p> </li> </ul> <h3 id="training--efficiency">Training &amp; Efficiency</h3> <ul> <li> <p><strong><a href="https://arxiv.org/abs/2202.08906" rel="external nofollow noopener" target="_blank">ST-MoE: Designing Stable and Transferable Sparse Expert Models</a></strong> — Zoph et al., Google (2022) A detailed investigation into what makes MoE training unstable and how to fix it. Router z-loss, capacity factor tuning, and expert dropout. Essential reading before training your own MoE.</p> </li> <li> <p><strong><a href="https://arxiv.org/abs/2208.02813" rel="external nofollow noopener" target="_blank">Towards Understanding Mixture of Experts in Deep Learning</a></strong> — Chen et al. (2022) Theoretical analysis of why MoE works: shows that sparse routing implicitly implements a form of conditional computation that dense models can’t replicate efficiently.</p> </li> <li> <p><strong><a href="https://arxiv.org/abs/2202.09368" rel="external nofollow noopener" target="_blank">Expert Choice Routing: Better MoE with Expert-Selected Tokens</a></strong> — Zhou et al., Google (2022) Inverts the routing: instead of tokens choosing experts, experts choose tokens. Eliminates dropped tokens, achieves perfect load balance. An elegant alternative to the standard approach.</p> </li> </ul> <h3 id="interpretability">Interpretability</h3> <ul> <li> <strong><a href="https://arxiv.org/abs/2310.01786" rel="external nofollow noopener" target="_blank">Do Sparse Language Models Generalize Well?</a></strong> — Research into whether different experts actually specialize for different topics, syntactic structures, or languages. The empirical answer: yes, but it’s messier than you’d hope. Some experts specialize cleanly; others are general-purpose.</li> </ul> <hr> <p><em>MoE is a bet on a simple idea: not every token needs the same computation. The remarkable thing is how much that bet pays off. A model that thinks selectively — routing each token to relevant specialists, ignoring the rest — turns out to be both more capable and cheaper to run than one that applies maximum force to everything. Intelligence, apparently, is less about brute force and more about knowing when not to think.</em></p> </div> </article> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 Sai Sridhar Tarra. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank">al-folio</a> theme. </div> </footer> <script>
+  window.alFolio = {
+    compatBootstrap: false
+  };
+</script> <script src="/assets/js/nav-toggle.js?v=141bd79a73ebc0f0b6ea58e440ae79fc"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script> <script defer src="/assets/js/masonry.js?v=e49affc7bd2646f6acdad1dbe02c2359" type="text/javascript"></script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script> <script src="/assets/al_math/js/mathjax-setup.js"></script> <script defer src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6" crossorigin="anonymous"></script> <script src="/assets/js/tooltips-setup.js?v=fe487e99db6c43751e6e7bdb2d6a0611"></script> <script src="/assets/js/no_defer.js?v=53b1b1a645525975c963ce8bf8bfefcf"></script> <script defer src="/assets/js/common.js?v=87baac90f765f2f3362dcf6aaf312a8a"></script> <script defer src="/assets/js/copy_code.js?v=c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer src="/assets/js/jupyter_new_tab.js?v=896d254890d9b47f0281f63bfccf0dee"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous"></script> <script defer src="/assets/al_img_tools/js/zoom.js"></script> <script defer src="/assets/js/progress-bar.js?v=499464c5c63ced6cf7ad62509f1e2610" type="text/javascript"></script> <script src="https://cdn.jsdelivr.net/npm/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js" integrity="sha256-uMJJ3EoTyfRBoTbR+lrfu1uRQ87RZG8AR3cVNuQVeFg=" crossorigin="anonymous"></script> <script>
+    addBackToTop();
+  </script> <script type="module" src="/assets/al_search/js/search/ninja-keys.min.js"></script> <ninja-keys hidebreadcrumbs noautoloadmdicons placeholder="Type to start searching"></ninja-keys> <script src="/assets/al_search/js/search-setup.js"></script> <script>
+// get the ninja-keys element
+const ninja = document.querySelector('ninja-keys');
+
+// add the home and posts menu items
+ninja.data = [{
+    id: "nav-about",
+    title: "about",
+    section: "Navigation",
+    handler: () => {
+      window.location.href = "/";
+    },
+  },{id: "nav-blog",
+          title: "blog",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/blog/";
+          },
+        },{id: "nav-publications",
+          title: "publications",
+          description: "publications by categories in reversed chronological order. generated by jekyll-scholar.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/publications/";
+          },
+        },{id: "nav-projects",
+          title: "projects",
+          description: "A growing collection of your cool projects.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/projects/";
+          },
+        },{id: "nav-repositories",
+          title: "repositories",
+          description: "Edit the `_data/repositories.yml` and change the `github_users` and `github_repos` lists to include your own GitHub profile and repositories.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/repositories/";
+          },
+        },{id: "nav-cv",
+          title: "CV",
+          description: "This is a description of the page. You can modify it in '_pages/cv.md'. You can also change or remove the top pdf download button.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/cv/";
+          },
+        },{id: "nav-teaching",
+          title: "teaching",
+          description: "Course materials, schedules, and resources for classes taught.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/teaching/";
+          },
+        },{id: "nav-people",
+          title: "people",
+          description: "members of the lab or group",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/people/";
+          },
+        },{id: "dropdown-bookshelf",
+              title: "bookshelf",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/books/";
+              },
+            },{id: "dropdown-blog",
+              title: "blog",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/blog/";
+              },
+            },{id: "post-byte-latent-transformers-training-ai-without-a-tokenizer",
+        
+          title: "Byte-Latent Transformers: Training AI Without a Tokenizer",
+        
+        description: "Every LLM you've ever used runs on a tokenizer that chops text into chunks before the model sees a single character. Meta's Byte-Latent Transformer throws that away entirely — and matches LLaMA 3 performance. Here's how.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/byte-latent-transformers/";
+          
+        },
+      },{id: "post-hopfield-networks-modern-associative-memory-the-1982-idea-hidden-inside-every-transformer",
+        
+          title: "Hopfield Networks → Modern Associative Memory: The 1982 Idea Hidden Inside Every Transformer...",
+        
+        description: "A forgotten idea from 1982 about how brains store memories turned out to be the exact math behind transformer attention. Here's the full journey — from energy landscapes to softmax.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/hopfield-networks/";
+          
+        },
+      },{id: "post-kv-cache-compression-how-llms-handle-million-token-contexts-without-running-out-of-memory",
+        
+          title: "KV Cache Compression: How LLMs Handle Million-Token Contexts Without Running Out of Memory...",
+        
+        description: "Every token you generate costs memory — permanently. At 1M token contexts, the KV cache alone can consume 100GB+ of VRAM. Here's how modern LLMs compress it without losing what matters.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/kv-cache-compression/";
+          
+        },
+      },{id: "post-mcp-server-starter-build-tools-ai-agents-can-actually-use",
+        
+          title: "MCP Server Starter: Build Tools AI Agents Can Actually Use",
+        
+        description: "Most tutorials show you how to call an LLM. This one shows you how to build the server on the other side — the tool layer that AI agents call into. MCP in 30 lines of Python.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/mcp-server-starter/";
+          
+        },
+      },{id: "post-tribe-v2-and-the-rise-of-in-silico-neuroscience",
+        
+          title: "TRIBE v2 and the Rise of In-Silico Neuroscience",
+        
+        description: "What if you could simulate a neuroscience experiment before running it on a single human subject? TRIBE v2 — a tri-modal foundation model trained on 1,000+ hours of fMRI data — is making that real.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/tribe-v2-neuroscience/";
+          
+        },
+      },{id: "post-rag-beyond-naive-chunking-hyde-reranking-colbert-and-graph-rag",
+        
+          title: "RAG Beyond Naive Chunking: HyDE, Reranking, ColBERT, and Graph RAG",
+        
+        description: "Most RAG systems chunk documents, embed them, and call it a day. That's the floor, not the ceiling. Here's what production retrieval actually looks like — HyDE, late interaction, reranking pipelines, and knowledge graphs that reason over structure.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/rag-beyond-naive-chunking/";
+          
+        },
+      },{id: "post-mixture-of-experts-how-a-141b-model-runs-like-a-39b",
+        
+          title: "Mixture of Experts: How a 141B Model Runs Like a 39B",
+        
+        description: "GPT-4, Mixtral, and DeepSeek aren't the dense models most people imagine. They're sparse — activating only a fraction of their parameters per token. Here's the architecture that makes that possible, and why it changes everything about how we scale AI.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/mixture-of-experts/";
+          
+        },
+      },{id: "post-claude-mythos-anthropic-39-s-most-powerful-model-built-for-cybersecurity-not-for-everyone",
+        
+          title: "Claude Mythos: Anthropic's Most Powerful Model — Built for Cybersecurity, Not for Everyone...",
+        
+        description: "Anthropic just unveiled Claude Mythos Preview — a frontier model that autonomously finds zero-day vulnerabilities, outperforms every other Claude model on coding benchmarks, and is explicitly not available to the public. Here's everything you need to know about the most capable — and most restricted — AI model Anthropic has ever built.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/claude-mythos-cybersecurity/";
+          
+        },
+      },{id: "post-artemis-ii-humanity-39-s-return-to-the-moon-everything-that-has-happened-and-what-comes-next",
+        
+          title: "Artemis II: Humanity's Return to the Moon — Everything That Has Happened and...",
+        
+        description: "Artemis II is currently in flight — the first crewed mission beyond low Earth orbit since Apollo 17 in 1972. Here is a complete account of the mission, the crew, the records broken, and what comes next on humanity's road back to the Moon.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/artemis-2-mission/";
+          
+        },
+      },{id: "post-i-rebuilt-claude-code-in-go-works-offline-with-ollama-no-api-key-required",
+        
+          title: "I Rebuilt Claude Code in Go — Works Offline with Ollama, No API...",
+        
+        description: "After the Claude Code source leak revealed how agentic CLI tools are built, I reverse-engineered the core loop and rebuilt it from scratch in Go — with support for both Anthropic's API and fully offline Ollama models. Here's what I learned.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/forge-go-ai-agent/";
+          
+        },
+      },{id: "post-superposition-how-neural-networks-secretly-cram-more-concepts-than-they-have-neurons",
+        
+          title: "Superposition: How Neural Networks Secretly Cram More Concepts Than They Have Neurons",
+        
+        description: "Most engineers assume one neuron = one concept. They're wrong. Neural networks pack thousands of overlapping features into far fewer neurons using a trick from high-dimensional geometry — and understanding this changes everything about how we interpret AI.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/superposition-polysemanticity/";
+          
+        },
+      },{id: "post-understanding-transformers-the-architecture-behind-modern-ai",
+        
+          title: "Understanding Transformers: The Architecture Behind Modern AI",
+        
+        description: "A deep dive into the transformer architecture — the building block of GPT, BERT, and virtually every modern AI system. We'll implement multi-head attention from scratch.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2024/understanding-transformers/";
+          
+        },
+      },{id: "post-from-arima-to-lstm-choosing-the-right-model-for-time-series-forecasting",
+        
+          title: "From ARIMA to LSTM: Choosing the Right Model for Time-Series Forecasting",
+        
+        description: "A structured beginner-to-advanced guide to understanding ARIMA and LSTM models, how they work mathematically, and when to use each in real-world forecasting systems.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2024/arima-to-sarima/";
+          
+        },
+      },{id: "books-the-godfather",
+          title: 'The Godfather',
+          description: "",
+          section: "Books",handler: () => {
+              window.location.href = "/books/the_godfather/";
+            },},{id: "news-a-simple-inline-announcement",
+          title: 'A simple inline announcement.',
+          description: "",
+          section: "News",},{id: "news-a-long-announcement-with-details",
+          title: 'A long announcement with details',
+          description: "",
+          section: "News",handler: () => {
+              window.location.href = "/news/announcement_2/";
+            },},{id: "news-a-simple-inline-announcement-with-markdown-emoji-sparkles-smile",
+          title: 'A simple inline announcement with Markdown emoji! <img class="emoji" title=":sparkles:" alt=":sparkles:" src="https://github.githubassets.com/images/icons/emoji/unicode/2728.png" height="20" width="20"> <img class="emoji" title=":smile:" alt=":smile:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f604.png" height="20" width="20">',
+          description: "",
+          section: "News",},{id: "projects-demandcast",
+          title: 'DemandCast',
+          description: "Large-scale demand forecasting pipeline — LSTM with Temporal Attention achieving 22% lower MAPE across 50K+ products",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/1_demandcast/";
+            },},{id: "projects-mailair",
+          title: 'MailAir',
+          description: "AI-powered email assistant — LLMs + RAG auto-drafts replies, summarises threads, and prioritises your inbox",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/2_mailair/";
+            },},{id: "projects-skillswap",
+          title: 'SkillSwap',
+          description: "Peer-to-peer microlearning platform with credit-based economy, live WebRTC video sessions, and reputation tracking",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/3_skillswap/";
+            },},{id: "projects-explainable-stock-forecasting-engine",
+          title: 'Explainable Stock Forecasting Engine',
+          description: "Interpretable ML for stock price prediction with feature importance and model explanation techniques",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/4_stock_forecasting/";
+            },},{id: "projects-real-time-social-pulse-analyzer",
+          title: 'Real-Time Social Pulse Analyzer',
+          description: "Real-time trend detection and sentiment analysis from streaming social data using NLP",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/5_social_pulse/";
+            },},{id: "projects-adaptive-route-intelligence-engine",
+          title: 'Adaptive Route Intelligence Engine',
+          description: "High-performance real-time pathfinding using A* and Bidirectional Dijkstra algorithms in C++",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/6_route_intelligence/";
+            },},{id: "teachings-data-science-fundamentals",
+          title: 'Data Science Fundamentals',
+          description: "This course covers the foundational aspects of data science, including data collection, cleaning, analysis, and visualization. Students will learn practical skills for working with real-world datasets.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/data-science-fundamentals/";
+            },},{id: "teachings-introduction-to-machine-learning",
+          title: 'Introduction to Machine Learning',
+          description: "This course provides an introduction to machine learning concepts, algorithms, and applications. Students will learn about supervised and unsupervised learning, model evaluation, and practical implementations.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/introduction-to-machine-learning/";
+            },},{
+        id: 'social-cv',
+        title: 'CV',
+        section: 'Socials',
+        handler: () => {
+          window.open("/assets/pdf/resume.pdf", "_blank");
+        },
+      },{
+        id: 'social-email',
+        title: 'email',
+        section: 'Socials',
+        handler: () => {
+          window.open("mailto:%74%61%72%72%61%73%72%69%64%68%61%72%31%31%35%34@%67%6D%61%69%6C.%63%6F%6D", "_blank");
+        },
+      },{
+        id: 'social-rss',
+        title: 'RSS Feed',
+        section: 'Socials',
+        handler: () => {
+          window.open("/feed.xml", "_blank");
+        },
+      },{
+        id: 'social-github',
+        title: 'GitHub',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://github.com/sridhar-3009", "_blank");
+        },
+      },{
+        id: 'social-linkedin',
+        title: 'LinkedIn',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.linkedin.com/in/sai-sridhar-tarra-2a77561a2", "_blank");
+        },
+      },{
+        id: 'social-x',
+        title: 'X',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://twitter.com/sridhar_3009", "_blank");
+        },
+      },{
+      id: 'light-theme',
+      title: 'Change theme to light',
+      description: 'Change the theme of the site to Light',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("light");
+      },
+    },
+    {
+      id: 'dark-theme',
+      title: 'Change theme to dark',
+      description: 'Change the theme of the site to Dark',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("dark");
+      },
+    },
+    {
+      id: 'system-theme',
+      title: 'Use system default theme',
+      description: 'Change the theme of the site to System Default',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("system");
+      },
+    },];
+
+</script> <script src="/assets/al_search/js/shortcut-key.js"></script> </body> </html>

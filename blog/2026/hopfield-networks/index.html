@@ -1,0 +1,377 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <title> Hopfield Networks → Modern Associative Memory: The 1982 Idea Hidden Inside Every Transformer | Sai Sridhar Tarra </title> <meta name="author" content="Sai Sridhar Tarra"> <meta name="description" content="A forgotten idea from 1982 about how brains store memories turned out to be the exact math behind transformer attention. Here's the full journey — from energy landscapes to softmax."> <meta name="keywords" content="machine learning, AI engineer, LLM, MLOps, NLP, portfolio, Sai Sridhar Tarra"> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <style>
+  :root {
+    --max-content-width: 930px;
+  }
+</style> <link rel="stylesheet" href="/assets/css/tailwind.css?v=50c64c15cbb9fd1ce6056fdb8bcb4b62"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.5/css/academicons.min.css" integrity="sha256-SzrCOBJbGVFMahewkgjwnApaV2+av1DwMAA+/QGLyZw=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/scholar-icons@1.0.3/css/scholar-icons.css" integrity="sha256-VY3hHVj/hNX3fYG6wtbA6TcKJQl7+FthzGSyIB64klY=" crossorigin="anonymous"> <link defer rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&amp;display=swap"> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-github.css?v=591dab5a4e56573bf4ef7fd332894c99" media="" id="highlight_theme_light"> <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%E2%9A%A1&lt;/text&gt;&lt;/svg&gt;"> <link rel="stylesheet" href="/assets/css/main.css?v=f0b101217084a90093badfe99ff9a7d1"> <link rel="canonical" href="https://sridhar-3009.github.io/blog/2026/hopfield-networks/"> <script src="/assets/js/theme.js?v=7af685e2ba20b37fef545c97b8064050"></script> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-native.css?v=5847e5ed4a4568527aa6cfab446049ca" media="none" id="highlight_theme_dark"> <script>
+    initTheme();
+  </script> </head> <body class="fixed-top-nav "> <header> <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top" role="navigation"> <div class="container"> <a class="navbar-brand title font-weight-lighter" href="/"> Sai Sridhar Tarra </a> <button class="navbar-toggler collapsed navbar-toggler-main" type="button" data-nav-toggle="navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar top-bar"></span> <span class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span> </button> <div class="collapse navbar-collapse navbar-collapse-main" id="navbarNav"> <ul class="navbar-nav navbar-menu-list flex-nowrap"> <li class="nav-item "> <a class="nav-link" href="/">about </a> </li> <li class="nav-item active"> <a class="nav-link" href="/blog/">blog </a> </li> <li class="nav-item "> <a class="nav-link" href="/publications/">publications </a> </li> <li class="nav-item "> <a class="nav-link" href="/projects/">projects </a> </li> <li class="nav-item "> <a class="nav-link" href="/repositories/">repositories </a> </li> <li class="nav-item "> <a class="nav-link" href="/cv/">CV </a> </li> <li class="nav-item "> <a class="nav-link" href="/teaching/">teaching </a> </li> <li class="nav-item "> <a class="nav-link" href="/people/">people </a> </li> <li class="nav-item dropdown "> <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-nav-dropdown-toggle="true" aria-haspopup="true" aria-expanded="false">submenus </a> <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown"> <a class="dropdown-item " href="/books/">bookshelf</a> <div class="dropdown-divider"></div> <a class="dropdown-item " href="/blog/">blog</a> </div> </li> <li class="nav-item"> <button id="search-toggle" type="button" title="Search" aria-label="Open search"> <span class="nav-link">ctrl k <i class="fa-solid fa-magnifying-glass"></i></span> </button> </li> <li class="toggle-container"> <button id="light-toggle" type="button" title="Change theme" aria-label="Change color theme"> <i class="fa-half-sun-moon" id="light-toggle-system"></i> <i class="fa-solid fa-moon" id="light-toggle-dark"></i> <i class="fa-solid fa-sun" id="light-toggle-light"></i> </button> </li> </ul> </div> </div> </nav> <progress id="progress" value="0"> <div class="progress-container"> <span class="progress-bar"></span> </div> </progress> </header> <div class="container mt-5" role="main"> <div class="post"> <header class="post-header"> <h1 class="post-title">Hopfield Networks → Modern Associative Memory: The 1982 Idea Hidden Inside Every Transformer</h1> <p class="post-meta"> Created on May 05, 2026 </p> <p class="post-tags"> <a href="/blog/2026"> <i class="fa-solid fa-calendar fa-sm"></i> 2026 </a>   ·   <a href="/blog/tag/hopfield-networks"> <i class="fa-solid fa-hashtag fa-sm"></i> Hopfield Networks</a>   <a href="/blog/tag/attention"> <i class="fa-solid fa-hashtag fa-sm"></i> Attention</a>   <a href="/blog/tag/transformers"> <i class="fa-solid fa-hashtag fa-sm"></i> Transformers</a>   <a href="/blog/tag/associative-memory"> <i class="fa-solid fa-hashtag fa-sm"></i> Associative Memory</a>   <a href="/blog/tag/energy-models"> <i class="fa-solid fa-hashtag fa-sm"></i> Energy Models</a>   <a href="/blog/tag/neural-networks"> <i class="fa-solid fa-hashtag fa-sm"></i> Neural Networks</a>   ·   <a href="/blog/category/deep-learning"> <i class="fa-solid fa-tag fa-sm"></i> deep-learning</a> </p> </header> <article class="post-content"> <div id="markdown-content"> <h1 id="hopfield-networks--modern-associative-memory-the-1982-idea-hidden-inside-every-transformer">Hopfield Networks → Modern Associative Memory: The 1982 Idea Hidden Inside Every Transformer</h1> <p>In 2020, a group of researchers from JKU Linz published a paper with one of the boldest titles in recent ML history: <strong>“Hopfield Networks is All You Need.”</strong></p> <p>A deliberate nod to the transformer paper. A provocation. And, it turns out, a theorem.</p> <p>They proved that the update rule of a modern Hopfield network — a theoretical model of associative memory from statistical physics — is <strong>mathematically identical</strong> to the attention mechanism in transformers. The softmax you use every day is a Hopfield retrieval step. Every attention head is running associative memory.</p> <p>This is the story of how a 1982 idea about how brains might store memories quietly became the core of the most powerful AI systems in history.</p> <hr> <h2 id="the-memory-problem">The Memory Problem</h2> <p>How do you recognize a face you haven’t seen in ten years?</p> <p>You don’t store a perfect photograph in your head. You store something compressed, something fragmentary. When you see that person again — older, different haircut, different context — your brain fills in the gaps. It retrieves the full memory from a partial cue.</p> <p>This is <strong>associative memory</strong>. Not lookup-by-address (like a computer reading <code class="language-plaintext highlighter-rouge">memory[0x7FFF]</code>). Lookup-by-content. You give a noisy, incomplete query — and the system finds the closest stored pattern and returns it complete.</p> <p>Building a mathematical model of this was John Hopfield’s goal in 1982.</p> <hr> <h2 id="part-1-the-classical-hopfield-network">Part 1: The Classical Hopfield Network</h2> <h3 id="the-setup">The Setup</h3> <p>Imagine N light switches arranged in a grid. Each switch is either ON (+1) or OFF (-1). Every switch is connected to every other switch by a wire with a weight on it. The whole thing is fully connected, symmetric (the weight from switch A to B equals the weight from B to A), and has no self-connections.</p> <p>This is the Hopfield network. The state of the system at any moment is the pattern of ON/OFF switches — a vector <code class="language-plaintext highlighter-rouge">s = [s1, s2, ..., sN]</code> where each value is either -1 or +1.</p> <h3 id="the-energy-function">The Energy Function</h3> <p>Hopfield borrowed an idea from physics: spin glasses. In physics, a spin glass is a magnet where atoms are frozen in random orientations. The system has an <strong>energy function</strong> that it naturally minimizes over time.</p> <p>For the Hopfield network, the energy is:</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>E = -½ × Σ(i≠j) w_ij × s_i × s_j
+</code></pre></div></div> <p>Think of it this way. If two connected switches <code class="language-plaintext highlighter-rouge">i</code> and <code class="language-plaintext highlighter-rouge">j</code> have a large positive weight <code class="language-plaintext highlighter-rouge">w_ij</code>, and they’re both ON (+1), the product <code class="language-plaintext highlighter-rouge">s_i × s_j = +1</code> contributes a large negative term to <code class="language-plaintext highlighter-rouge">E</code> — lowering the energy. The system “likes” when highly-connected switches agree. Energy decreases when the network settles into its preferred configurations.</p> <p>The key property: <strong>every single-switch update either lowers the energy or leaves it unchanged</strong>. The network can never get stuck in an endless loop. It always converges.</p> <h3 id="storing-memories-with-hebbian-learning">Storing Memories with Hebbian Learning</h3> <p>To store <code class="language-plaintext highlighter-rouge">p</code> patterns, you set the weights using the Hebbian rule:</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>w_ij = (1/N) × Σ(μ=1 to p) [ ξ_i^μ × ξ_j^μ ]
+</code></pre></div></div> <p>“Neurons that fire together, wire together.” For each stored pattern <code class="language-plaintext highlighter-rouge">μ</code>, if neuron <code class="language-plaintext highlighter-rouge">i</code> and neuron <code class="language-plaintext highlighter-rouge">j</code> are both ON (or both OFF), you strengthen the connection between them. Do this for all patterns, and each pattern carves out a <strong>local minimum</strong> in the energy landscape.</p> <h3 id="the-energy-landscape-as-terrain">The Energy Landscape as Terrain</h3> <p>Think of the energy landscape as a mountainous terrain. Each valley is a stored memory — a stable fixed point the system is attracted to. Corrupted or partial inputs are hikers dropped somewhere on a hillside. The update rule is gravity: the hiker slides downhill and settles in the nearest valley, retrieving the closest stored memory.</p> <p>Give the network a photo of a face with half the pixels blacked out. It slides down to the nearest energy minimum — the fully-complete stored face. The gap gets filled.</p> <h3 id="retrieval-in-action">Retrieval in Action</h3> <p>Start from a query (a noisy or partial pattern). Apply the update rule repeatedly:</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>s_i ← sign( Σ_j w_ij × s_j )
+</code></pre></div></div> <p>One neuron updates at a time. Each flip lowers <code class="language-plaintext highlighter-rouge">E</code>. Eventually you converge to the nearest stored pattern. The network has retrieved a memory from a fragment.</p> <hr> <h2 id="part-2-the-capacity-wall-and-the-ghost-memory-problem">Part 2: The Capacity Wall and the Ghost Memory Problem</h2> <h3 id="the-0138n-limit">The 0.138N Limit</h3> <p>Here’s where classical Hopfield networks hit a wall.</p> <p>For a network of <code class="language-plaintext highlighter-rouge">N</code> neurons trained with Hebbian weights, reliable retrieval works only up to approximately:</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>C ≈ 0.138 × N
+</code></pre></div></div> <p>Roughly 14 patterns per 100 neurons. For 1000 neurons, 138 memories max. Beyond this threshold, retrieval collapses catastrophically.</p> <p>The intuition: when you store a new pattern by strengthening certain connections, you also slightly perturb all existing stored patterns. Each new memory leaves a ghost in every other basin. Up to 0.138N patterns, these ghosts cancel out via averaging. Above it, they accumulate and corrupt retrieval.</p> <blockquote> <p>A library where every new book smears a tiny bit of ink across every existing book. Up to 138 books per 1000 pages you can still read them. Add the 139th and the smearing cascades into noise.</p> </blockquote> <h3 id="spurious-states">Spurious States</h3> <p>The second failure mode is subtler and stranger: <strong>spurious attractors</strong> — energy minima that aren’t any stored pattern.</p> <p>The most common type is a <strong>mixture state</strong>. If you store patterns A, B, and C, the combination <code class="language-plaintext highlighter-rouge">sign(A + B - C)</code> is often also a stable minimum. It’s not a real memory — it’s a hallucination, a weighted blend of three real ones.</p> <p>Another guaranteed spurious state: the bitwise inverse of every stored pattern is always also a stable fixed point. The network converges — but to somewhere that was never stored. The hiker finds a phantom valley that shouldn’t exist.</p> <hr> <h2 id="part-3-the-2020-resurrection">Part 3: The 2020 Resurrection</h2> <p>For 30 years, Hopfield networks were mostly taught as historical curiosities. Then three papers rewrote the story:</p> <p><strong>Krotov &amp; Hopfield (2016):</strong> Replace the quadratic interaction in the energy with a higher-order polynomial. Capacity scales as <code class="language-plaintext highlighter-rouge">N^(n-1)</code>.</p> <p><strong>Demircigil et al. (2017):</strong> Use an exponential interaction <code class="language-plaintext highlighter-rouge">e^z</code>. Capacity becomes <code class="language-plaintext highlighter-rouge">2^(N/2)</code> — exponential in N.</p> <p><strong>Ramsauer et al. (2020):</strong> Extend to <strong>continuous states</strong> (not binary ±1), derive the update rule cleanly, and discover it is exactly transformer attention.</p> <h3 id="the-new-energy-function">The New Energy Function</h3> <p>The continuous modern Hopfield network has two competing terms in its energy:</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>E = -lse(β, X^T × ξ)  +  ½ × ||ξ||²
+</code></pre></div></div> <p>The first term — <code class="language-plaintext highlighter-rouge">lse</code>, the log-sum-exp function — pulls the query <code class="language-plaintext highlighter-rouge">ξ</code> toward stored patterns <code class="language-plaintext highlighter-rouge">X</code>. The second term is a regularizer that prevents <code class="language-plaintext highlighter-rouge">ξ</code> from running off to infinity to maximize the first.</p> <p>Log-sum-exp is a smooth version of the max function:</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>lse(β, z) = (1/β) × log( Σ_i exp(β × z_i) )
+</code></pre></div></div> <p>At large <code class="language-plaintext highlighter-rouge">β</code>, it becomes a hard argmax — pick the single closest pattern. At small <code class="language-plaintext highlighter-rouge">β</code>, it averages everything. The <code class="language-plaintext highlighter-rouge">β</code> parameter is the sharpness knob.</p> <h3 id="the-update-rule">The Update Rule</h3> <p>One step of gradient descent on this energy gives:</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ξ_new = X × softmax(β × X^T × ξ)
+</code></pre></div></div> <p>Unpack this:</p> <ul> <li> <code class="language-plaintext highlighter-rouge">X^T × ξ</code> computes the dot-product similarity between the query and every stored pattern</li> <li> <code class="language-plaintext highlighter-rouge">softmax(β × ...)</code> turns these into weights that sum to 1, concentrating weight on the most similar patterns</li> <li> <code class="language-plaintext highlighter-rouge">X × [weights]</code> returns a weighted combination of stored patterns — a retrieved memory</li> </ul> <p>This is <strong>not a local flip of one neuron</strong>. It’s a global, continuous update that simultaneously considers all stored patterns and returns a smooth interpolation weighted by similarity.</p> <h3 id="exponential-storage-capacity">Exponential Storage Capacity</h3> <p>The modern Hopfield network can store approximately <code class="language-plaintext highlighter-rouge">2^(N/2)</code> patterns with exponentially small retrieval error.</p> <p>For <code class="language-plaintext highlighter-rouge">N = 100</code> dimensions: classical capacity ≈ 14 patterns. Modern capacity ≈ 2^50 ≈ one quadrillion patterns.</p> <p>The reason: with exponential interaction, each stored pattern carves out a deep, narrow basin. Even when you pack in <code class="language-plaintext highlighter-rouge">2^(N/2)</code> patterns, the basins stay separated. Spurious states essentially vanish because the network almost always converges in <strong>a single update step</strong> directly to the closest true memory.</p> <hr> <h2 id="part-4-the-attention-mechanism-is-hopfield-retrieval">Part 4: The Attention Mechanism is Hopfield Retrieval</h2> <p>Now for the twist.</p> <p>Generalize the update rule to handle multiple simultaneous queries — a batch of <code class="language-plaintext highlighter-rouge">M</code> query vectors processed in parallel:</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Ξ_new = X × softmax(β × X^T × Ξ)
+</code></pre></div></div> <p>Now add learnable linear projections — a standard trick for adding expressive power:</p> <table> <thead> <tr> <th>Hopfield concept</th> <th>Transformer equivalent</th> </tr> </thead> <tbody> <tr> <td>Stored patterns X</td> <td>Keys: K = X × W_K</td> </tr> <tr> <td>Query states Ξ</td> <td>Queries: Q = Ξ × W_Q</td> </tr> <tr> <td>Patterns in output space</td> <td>Values: V = X × W_V</td> </tr> <tr> <td>Inverse temperature β</td> <td>Scaling factor: 1 / sqrt(d_k)</td> </tr> </tbody> </table> <p>Substitute all of that in and you get:</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Z = softmax( Q × K^T / sqrt(d_k) ) × V
+</code></pre></div></div> <p>This is the <strong>exact transformer self-attention formula</strong>. Not similar. Not analogous. Identical.</p> <p>Every time a transformer runs attention, it is performing one step of Modern Hopfield retrieval. The key matrix is a store of patterns. The query is a partial, noisy signal. The softmax computes similarity scores. The value matrix is the content being retrieved.</p> <h3 id="the-β-knob-and-layer-behavior">The β Knob and Layer Behavior</h3> <p>The scaling factor <code class="language-plaintext highlighter-rouge">1/sqrt(d_k)</code> is the Hopfield inverse temperature <code class="language-plaintext highlighter-rouge">β</code>. This has a direct interpretation for what different transformer layers are doing:</p> <p><strong>Low β → diffuse softmax → global averaging.</strong> The softmax spreads weight across many keys. The retrieved output is a blend of many stored patterns. This is what lower transformer layers do: aggregate broad contextual information.</p> <p><strong>High β → sharp softmax → single-pattern retrieval.</strong> The softmax concentrates almost all weight on the single most-similar key. The output is essentially a copy of that one stored pattern. This is what upper transformer layers do: retrieve specific entities, facts, syntactic structures.</p> <p>The temperature isn’t fixed — learned attention heads discover the right <code class="language-plaintext highlighter-rouge">β</code> for their role in the hierarchy.</p> <h3 id="why-spurious-states-dont-matter-in-practice">Why Spurious States Don’t Matter in Practice</h3> <p>Modern transformers operate far below the exponential storage capacity of their attention heads. The number of tokens in context (say, 4096) is astronomically smaller than <code class="language-plaintext highlighter-rouge">2^(d_k/2)</code> for typical <code class="language-plaintext highlighter-rouge">d_k = 64</code> — capacity around 4 billion patterns. The network is running at a fraction of a percent of its storage limit. Every basin is clean. Retrieval converges in one step. Spurious states don’t appear.</p> <blockquote> <p>The classical library where books smear each other is replaced by a perfect digital index. Each book has its own exact address. One lookup, no cross-contamination.</p> </blockquote> <hr> <h2 id="part-5-what-this-means-for-transformer-internals">Part 5: What This Means for Transformer Internals</h2> <p>The Hopfield lens gives new language for mechanistic interpretability.</p> <h3 id="attention-heads-as-memories">Attention Heads as Memories</h3> <p>Every attention head in every layer is storing patterns in its key matrix and retrieving content via its value matrix. The “memories” aren’t fixed — they’re computed fresh from the input on each forward pass. But they behave like memories: the softmax retrieval selects which contextual information to bring forward.</p> <h3 id="three-types-of-attention-fixed-points">Three Types of Attention Fixed Points</h3> <p>Ramsauer et al. classify transformer behavior into three retrieval regimes:</p> <ol> <li> <p><strong>Global averaging</strong> (lower layers): The output is close to the mean of all value vectors. The head is pooling global context. No specific memory retrieved.</p> </li> <li> <p><strong>Metastable retrieval</strong> (middle layers): The output averages a cluster of similar tokens. Semantic grouping — retrieving “all mentions of the subject” rather than one specific occurrence.</p> </li> <li> <p><strong>Sharp retrieval</strong> (upper layers): The output is essentially a single value vector. The head has found an exact match. This is where induction heads, factual recall, and entity tracking happen.</p> </li> </ol> <h3 id="the-hopfield-layers-library">The <code class="language-plaintext highlighter-rouge">hopfield-layers</code> Library</h3> <p>Ramsauer’s team shipped three PyTorch modules that wrap attention as explicit associative memory:</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="n">hflayers</span> <span class="kn">import</span> <span class="n">Hopfield</span><span class="p">,</span> <span class="n">HopfieldLayer</span><span class="p">,</span> <span class="n">HopfieldPooling</span>
+
+<span class="c1"># Full associative memory — both queries and stored patterns learnable
+</span><span class="n">layer</span> <span class="o">=</span> <span class="nc">Hopfield</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">hidden_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">num_heads</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="c1"># Fixed stored patterns — like a learned prototype bank / lookup table
+</span><span class="n">lookup</span> <span class="o">=</span> <span class="nc">HopfieldLayer</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">quantity</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+
+<span class="c1"># Single query vector aggregating over variable-length sets
+# Replaces CLS token pooling or mean pooling
+</span><span class="n">pooler</span> <span class="o">=</span> <span class="nc">HopfieldPooling</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>
+</code></pre></div></div> <p>They used <code class="language-plaintext highlighter-rouge">HopfieldPooling</code> to classify immune repertoires — sets of hundreds of thousands of antibody sequences — and hit state-of-the-art. The network retrieved diagnostic antibody patterns from a massive noisy pool in a single forward pass.</p> <hr> <h2 id="the-bigger-picture">The Bigger Picture</h2> <p>When Vaswani et al. wrote “Attention is All You Need” in 2017, they described attention as a lookup mechanism. Queries, keys, values. Soft selection. Practical and effective.</p> <p>What Ramsauer et al. revealed in 2020 is that this “practical mechanism” has a 40-year theoretical foundation in statistical physics and neuroscience. It is not just a useful trick — it is the provably optimal way to do associative memory retrieval with continuous states and exponential capacity.</p> <p>Every time GPT-4 recalls a fact, every time a code model identifies a variable name, every time a vision transformer detects an object — they are all running a Hopfield retrieval step. Storing patterns in keys, retrieving content from values, computing similarity with softmax.</p> <p>Hopfield’s 1982 paper was about how brains might work. It turned out to describe, precisely, how the best artificial minds we’ve built actually work.</p> <p>The 1982 idea wasn’t wrong. It was just 38 years early.</p> <hr> <h2 id="further-reading">Further Reading</h2> <ul> <li> <a href="https://arxiv.org/abs/2008.02217" rel="external nofollow noopener" target="_blank">Hopfield Networks is All You Need</a> — Ramsauer et al. 2020 (the paper)</li> <li><a href="https://ml-jku.github.io/hopfield-layers/" rel="external nofollow noopener" target="_blank">Official Blog &amp; hopfield-layers library</a></li> <li><a href="https://en.wikipedia.org/wiki/Modern_Hopfield_network" rel="external nofollow noopener" target="_blank">Modern Hopfield Network — Wikipedia</a></li> <li><a href="https://en.wikipedia.org/wiki/Hopfield_network" rel="external nofollow noopener" target="_blank">Hopfield network — Wikipedia</a></li> </ul> </div> </article> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 Sai Sridhar Tarra. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank">al-folio</a> theme. </div> </footer> <script>
+  window.alFolio = {
+    compatBootstrap: false
+  };
+</script> <script src="/assets/js/nav-toggle.js?v=141bd79a73ebc0f0b6ea58e440ae79fc"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script> <script defer src="/assets/js/masonry.js?v=e49affc7bd2646f6acdad1dbe02c2359" type="text/javascript"></script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script> <script src="/assets/al_math/js/mathjax-setup.js"></script> <script defer src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6" crossorigin="anonymous"></script> <script src="/assets/js/tooltips-setup.js?v=fe487e99db6c43751e6e7bdb2d6a0611"></script> <script src="/assets/js/no_defer.js?v=53b1b1a645525975c963ce8bf8bfefcf"></script> <script defer src="/assets/js/common.js?v=87baac90f765f2f3362dcf6aaf312a8a"></script> <script defer src="/assets/js/copy_code.js?v=c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer src="/assets/js/jupyter_new_tab.js?v=896d254890d9b47f0281f63bfccf0dee"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous"></script> <script defer src="/assets/al_img_tools/js/zoom.js"></script> <script defer src="/assets/js/progress-bar.js?v=499464c5c63ced6cf7ad62509f1e2610" type="text/javascript"></script> <script src="https://cdn.jsdelivr.net/npm/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js" integrity="sha256-uMJJ3EoTyfRBoTbR+lrfu1uRQ87RZG8AR3cVNuQVeFg=" crossorigin="anonymous"></script> <script>
+    addBackToTop();
+  </script> <script type="module" src="/assets/al_search/js/search/ninja-keys.min.js"></script> <ninja-keys hidebreadcrumbs noautoloadmdicons placeholder="Type to start searching"></ninja-keys> <script src="/assets/al_search/js/search-setup.js"></script> <script>
+// get the ninja-keys element
+const ninja = document.querySelector('ninja-keys');
+
+// add the home and posts menu items
+ninja.data = [{
+    id: "nav-about",
+    title: "about",
+    section: "Navigation",
+    handler: () => {
+      window.location.href = "/";
+    },
+  },{id: "nav-blog",
+          title: "blog",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/blog/";
+          },
+        },{id: "nav-publications",
+          title: "publications",
+          description: "publications by categories in reversed chronological order. generated by jekyll-scholar.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/publications/";
+          },
+        },{id: "nav-projects",
+          title: "projects",
+          description: "A growing collection of your cool projects.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/projects/";
+          },
+        },{id: "nav-repositories",
+          title: "repositories",
+          description: "Edit the `_data/repositories.yml` and change the `github_users` and `github_repos` lists to include your own GitHub profile and repositories.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/repositories/";
+          },
+        },{id: "nav-cv",
+          title: "CV",
+          description: "This is a description of the page. You can modify it in '_pages/cv.md'. You can also change or remove the top pdf download button.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/cv/";
+          },
+        },{id: "nav-teaching",
+          title: "teaching",
+          description: "Course materials, schedules, and resources for classes taught.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/teaching/";
+          },
+        },{id: "nav-people",
+          title: "people",
+          description: "members of the lab or group",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/people/";
+          },
+        },{id: "dropdown-bookshelf",
+              title: "bookshelf",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/books/";
+              },
+            },{id: "dropdown-blog",
+              title: "blog",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/blog/";
+              },
+            },{id: "post-byte-latent-transformers-training-ai-without-a-tokenizer",
+        
+          title: "Byte-Latent Transformers: Training AI Without a Tokenizer",
+        
+        description: "Every LLM you've ever used runs on a tokenizer that chops text into chunks before the model sees a single character. Meta's Byte-Latent Transformer throws that away entirely — and matches LLaMA 3 performance. Here's how.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/byte-latent-transformers/";
+          
+        },
+      },{id: "post-hopfield-networks-modern-associative-memory-the-1982-idea-hidden-inside-every-transformer",
+        
+          title: "Hopfield Networks → Modern Associative Memory: The 1982 Idea Hidden Inside Every Transformer...",
+        
+        description: "A forgotten idea from 1982 about how brains store memories turned out to be the exact math behind transformer attention. Here's the full journey — from energy landscapes to softmax.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/hopfield-networks/";
+          
+        },
+      },{id: "post-kv-cache-compression-how-llms-handle-million-token-contexts-without-running-out-of-memory",
+        
+          title: "KV Cache Compression: How LLMs Handle Million-Token Contexts Without Running Out of Memory...",
+        
+        description: "Every token you generate costs memory — permanently. At 1M token contexts, the KV cache alone can consume 100GB+ of VRAM. Here's how modern LLMs compress it without losing what matters.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/kv-cache-compression/";
+          
+        },
+      },{id: "post-mcp-server-starter-build-tools-ai-agents-can-actually-use",
+        
+          title: "MCP Server Starter: Build Tools AI Agents Can Actually Use",
+        
+        description: "Most tutorials show you how to call an LLM. This one shows you how to build the server on the other side — the tool layer that AI agents call into. MCP in 30 lines of Python.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/mcp-server-starter/";
+          
+        },
+      },{id: "post-tribe-v2-and-the-rise-of-in-silico-neuroscience",
+        
+          title: "TRIBE v2 and the Rise of In-Silico Neuroscience",
+        
+        description: "What if you could simulate a neuroscience experiment before running it on a single human subject? TRIBE v2 — a tri-modal foundation model trained on 1,000+ hours of fMRI data — is making that real.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/tribe-v2-neuroscience/";
+          
+        },
+      },{id: "post-rag-beyond-naive-chunking-hyde-reranking-colbert-and-graph-rag",
+        
+          title: "RAG Beyond Naive Chunking: HyDE, Reranking, ColBERT, and Graph RAG",
+        
+        description: "Most RAG systems chunk documents, embed them, and call it a day. That's the floor, not the ceiling. Here's what production retrieval actually looks like — HyDE, late interaction, reranking pipelines, and knowledge graphs that reason over structure.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/rag-beyond-naive-chunking/";
+          
+        },
+      },{id: "post-mixture-of-experts-how-a-141b-model-runs-like-a-39b",
+        
+          title: "Mixture of Experts: How a 141B Model Runs Like a 39B",
+        
+        description: "GPT-4, Mixtral, and DeepSeek aren't the dense models most people imagine. They're sparse — activating only a fraction of their parameters per token. Here's the architecture that makes that possible, and why it changes everything about how we scale AI.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/mixture-of-experts/";
+          
+        },
+      },{id: "post-claude-mythos-anthropic-39-s-most-powerful-model-built-for-cybersecurity-not-for-everyone",
+        
+          title: "Claude Mythos: Anthropic's Most Powerful Model — Built for Cybersecurity, Not for Everyone...",
+        
+        description: "Anthropic just unveiled Claude Mythos Preview — a frontier model that autonomously finds zero-day vulnerabilities, outperforms every other Claude model on coding benchmarks, and is explicitly not available to the public. Here's everything you need to know about the most capable — and most restricted — AI model Anthropic has ever built.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/claude-mythos-cybersecurity/";
+          
+        },
+      },{id: "post-artemis-ii-humanity-39-s-return-to-the-moon-everything-that-has-happened-and-what-comes-next",
+        
+          title: "Artemis II: Humanity's Return to the Moon — Everything That Has Happened and...",
+        
+        description: "Artemis II is currently in flight — the first crewed mission beyond low Earth orbit since Apollo 17 in 1972. Here is a complete account of the mission, the crew, the records broken, and what comes next on humanity's road back to the Moon.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/artemis-2-mission/";
+          
+        },
+      },{id: "post-i-rebuilt-claude-code-in-go-works-offline-with-ollama-no-api-key-required",
+        
+          title: "I Rebuilt Claude Code in Go — Works Offline with Ollama, No API...",
+        
+        description: "After the Claude Code source leak revealed how agentic CLI tools are built, I reverse-engineered the core loop and rebuilt it from scratch in Go — with support for both Anthropic's API and fully offline Ollama models. Here's what I learned.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/forge-go-ai-agent/";
+          
+        },
+      },{id: "post-superposition-how-neural-networks-secretly-cram-more-concepts-than-they-have-neurons",
+        
+          title: "Superposition: How Neural Networks Secretly Cram More Concepts Than They Have Neurons",
+        
+        description: "Most engineers assume one neuron = one concept. They're wrong. Neural networks pack thousands of overlapping features into far fewer neurons using a trick from high-dimensional geometry — and understanding this changes everything about how we interpret AI.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/superposition-polysemanticity/";
+          
+        },
+      },{id: "post-understanding-transformers-the-architecture-behind-modern-ai",
+        
+          title: "Understanding Transformers: The Architecture Behind Modern AI",
+        
+        description: "A deep dive into the transformer architecture — the building block of GPT, BERT, and virtually every modern AI system. We'll implement multi-head attention from scratch.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2024/understanding-transformers/";
+          
+        },
+      },{id: "post-from-arima-to-lstm-choosing-the-right-model-for-time-series-forecasting",
+        
+          title: "From ARIMA to LSTM: Choosing the Right Model for Time-Series Forecasting",
+        
+        description: "A structured beginner-to-advanced guide to understanding ARIMA and LSTM models, how they work mathematically, and when to use each in real-world forecasting systems.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2024/arima-to-sarima/";
+          
+        },
+      },{id: "books-the-godfather",
+          title: 'The Godfather',
+          description: "",
+          section: "Books",handler: () => {
+              window.location.href = "/books/the_godfather/";
+            },},{id: "news-a-simple-inline-announcement",
+          title: 'A simple inline announcement.',
+          description: "",
+          section: "News",},{id: "news-a-long-announcement-with-details",
+          title: 'A long announcement with details',
+          description: "",
+          section: "News",handler: () => {
+              window.location.href = "/news/announcement_2/";
+            },},{id: "news-a-simple-inline-announcement-with-markdown-emoji-sparkles-smile",
+          title: 'A simple inline announcement with Markdown emoji! <img class="emoji" title=":sparkles:" alt=":sparkles:" src="https://github.githubassets.com/images/icons/emoji/unicode/2728.png" height="20" width="20"> <img class="emoji" title=":smile:" alt=":smile:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f604.png" height="20" width="20">',
+          description: "",
+          section: "News",},{id: "projects-demandcast",
+          title: 'DemandCast',
+          description: "Large-scale demand forecasting pipeline — LSTM with Temporal Attention achieving 22% lower MAPE across 50K+ products",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/1_demandcast/";
+            },},{id: "projects-mailair",
+          title: 'MailAir',
+          description: "AI-powered email assistant — LLMs + RAG auto-drafts replies, summarises threads, and prioritises your inbox",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/2_mailair/";
+            },},{id: "projects-skillswap",
+          title: 'SkillSwap',
+          description: "Peer-to-peer microlearning platform with credit-based economy, live WebRTC video sessions, and reputation tracking",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/3_skillswap/";
+            },},{id: "projects-explainable-stock-forecasting-engine",
+          title: 'Explainable Stock Forecasting Engine',
+          description: "Interpretable ML for stock price prediction with feature importance and model explanation techniques",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/4_stock_forecasting/";
+            },},{id: "projects-real-time-social-pulse-analyzer",
+          title: 'Real-Time Social Pulse Analyzer',
+          description: "Real-time trend detection and sentiment analysis from streaming social data using NLP",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/5_social_pulse/";
+            },},{id: "projects-adaptive-route-intelligence-engine",
+          title: 'Adaptive Route Intelligence Engine',
+          description: "High-performance real-time pathfinding using A* and Bidirectional Dijkstra algorithms in C++",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/6_route_intelligence/";
+            },},{id: "teachings-data-science-fundamentals",
+          title: 'Data Science Fundamentals',
+          description: "This course covers the foundational aspects of data science, including data collection, cleaning, analysis, and visualization. Students will learn practical skills for working with real-world datasets.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/data-science-fundamentals/";
+            },},{id: "teachings-introduction-to-machine-learning",
+          title: 'Introduction to Machine Learning',
+          description: "This course provides an introduction to machine learning concepts, algorithms, and applications. Students will learn about supervised and unsupervised learning, model evaluation, and practical implementations.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/introduction-to-machine-learning/";
+            },},{
+        id: 'social-cv',
+        title: 'CV',
+        section: 'Socials',
+        handler: () => {
+          window.open("/assets/pdf/resume.pdf", "_blank");
+        },
+      },{
+        id: 'social-email',
+        title: 'email',
+        section: 'Socials',
+        handler: () => {
+          window.open("mailto:%74%61%72%72%61%73%72%69%64%68%61%72%31%31%35%34@%67%6D%61%69%6C.%63%6F%6D", "_blank");
+        },
+      },{
+        id: 'social-rss',
+        title: 'RSS Feed',
+        section: 'Socials',
+        handler: () => {
+          window.open("/feed.xml", "_blank");
+        },
+      },{
+        id: 'social-github',
+        title: 'GitHub',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://github.com/sridhar-3009", "_blank");
+        },
+      },{
+        id: 'social-linkedin',
+        title: 'LinkedIn',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.linkedin.com/in/sai-sridhar-tarra-2a77561a2", "_blank");
+        },
+      },{
+        id: 'social-x',
+        title: 'X',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://twitter.com/sridhar_3009", "_blank");
+        },
+      },{
+      id: 'light-theme',
+      title: 'Change theme to light',
+      description: 'Change the theme of the site to Light',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("light");
+      },
+    },
+    {
+      id: 'dark-theme',
+      title: 'Change theme to dark',
+      description: 'Change the theme of the site to Dark',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("dark");
+      },
+    },
+    {
+      id: 'system-theme',
+      title: 'Use system default theme',
+      description: 'Change the theme of the site to System Default',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("system");
+      },
+    },];
+
+</script> <script src="/assets/al_search/js/shortcut-key.js"></script> </body> </html>
