@@ -76,6 +76,7 @@ Both `AnthropicProvider` and `OllamaProvider` implement this. Swap the provider,
 
 The send-stream-tools-repeat loop from above, implemented cleanly:
 
+{% raw %}
 ```go
 func (a *Agent) Run(ctx context.Context, task string) error {
     messages := []Message{{Role: "user", Content: task}}
@@ -96,6 +97,7 @@ func (a *Agent) Run(ctx context.Context, task string) error {
     return nil
 }
 ```
+{% endraw %}
 
 ### 3. The 16 Built-in Tools
 
