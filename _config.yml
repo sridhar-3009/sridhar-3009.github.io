@@ -11,9 +11,7 @@ contact_note: >
 description: >
   Machine Learning Engineer at Accenture. Founder of MailAir.
   Building LLM-powered products and production ML systems.
-footer_text: >
-  Powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> with
-  <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme.
+footer_text: ""
 keywords: machine learning, AI engineer, LLM, MLOps, NLP, portfolio, Sai Sridhar Tarra
 lang: en
 icon: ⚡
