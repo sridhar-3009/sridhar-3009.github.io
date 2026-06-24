@@ -164,6 +164,7 @@ Here's the intuition.
 As models get larger, they get better at predicting common patterns — frequent words, standard syntax, typical phrases. With fixed tokenization, every token has the same representation cost regardless of how predictable it is. A token for `"the"` takes the same slot in the attention matrix as a token for `"Schrödinger"`.
 
 With entropy-based patching, as the model improves:
+
 - More bytes become predictable → they get compressed into larger patches
 - The effective sequence length decreases
 - The same latent transformer capacity gets focused on harder problems
@@ -203,15 +204,15 @@ A new programming language, a new markup format, a new domain — BLT handles it
 
 ## The Numbers
 
-| Benchmark | LLaMA 3 (tokens) | BLT (bytes) |
-|---|---|---|
-| FLOP budget | Matched | Matched |
-| Overall performance | Baseline | Matches or beats |
-| Character tasks | Weak | Significantly better |
-| Multilingual | Penalized by vocab | Equal cost per byte |
-| Robustness | Token-brittle | Byte-robust |
-| Vocabulary size | 128K | 256 (universal) |
-| OOV handling | Fragmentation | None |
+| Benchmark           | LLaMA 3 (tokens)   | BLT (bytes)          |
+| ------------------- | ------------------ | -------------------- |
+| FLOP budget         | Matched            | Matched              |
+| Overall performance | Baseline           | Matches or beats     |
+| Character tasks     | Weak               | Significantly better |
+| Multilingual        | Penalized by vocab | Equal cost per byte  |
+| Robustness          | Token-brittle      | Byte-robust          |
+| Vocabulary size     | 128K               | 256 (universal)      |
+| OOV handling        | Fragmentation      | None                 |
 
 At equal compute: BLT is competitive. At tasks that expose tokenization's weaknesses: BLT wins clearly.
 

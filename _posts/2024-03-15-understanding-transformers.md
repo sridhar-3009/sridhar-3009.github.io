@@ -11,7 +11,7 @@ related_posts: false
 
 # Understanding Transformers: The Architecture Behind Modern AI
 
-The transformer architecture, introduced in the landmark 2017 paper *"Attention Is All You Need"* by Vaswani et al., has become the foundational building block of modern AI. From GPT-4 to BERT, from DALL-E to Whisper — they all share the same core mechanism: **self-attention**.
+The transformer architecture, introduced in the landmark 2017 paper _"Attention Is All You Need"_ by Vaswani et al., has become the foundational building block of modern AI. From GPT-4 to BERT, from DALL-E to Whisper — they all share the same core mechanism: **self-attention**.
 
 In this post, I'll demystify how transformers work, build intuition for attention, and implement a minimal transformer from scratch in PyTorch.
 
@@ -28,6 +28,7 @@ Attention(Q, K, V) = softmax(QK^T / √d_k) * V
 ```
 
 Where:
+
 - **Q** (Query): "What am I looking for?"
 - **K** (Key): "What do I contain?"
 - **V** (Value): "What do I actually pass forward?"
@@ -94,6 +95,7 @@ class MultiHeadAttention(nn.Module):
 ## The Transformer Block
 
 Each transformer block stacks:
+
 1. **Multi-head self-attention**
 2. **Add & Norm** (residual connection + layer norm)
 3. **Feed-forward network** (two linear layers with ReLU)
@@ -127,6 +129,7 @@ class TransformerBlock(nn.Module):
 ## Why Multi-Head Attention?
 
 Multiple heads allow the model to attend to different aspects simultaneously:
+
 - One head might capture **syntactic relationships** (subject-verb agreement)
 - Another might capture **semantic similarity** (synonyms)
 - Yet another might capture **positional patterns** (nearby words)
@@ -161,6 +164,7 @@ class PositionalEncoding(nn.Module):
 ## Scaling to LLMs
 
 Modern LLMs like GPT-4 stack 96+ transformer blocks with:
+
 - **Flash Attention** for memory-efficient attention computation
 - **Rotary Position Embeddings (RoPE)** for better length generalization
 - **Grouped Query Attention (GQA)** for faster inference
@@ -183,4 +187,4 @@ Understanding transformers is the foundational knowledge every modern ML enginee
 
 ---
 
-*Questions or thoughts? Reach out on [Twitter](https://twitter.com/saisridhartarra) or [LinkedIn](https://linkedin.com/in/saisridhartarra).*
+_Questions or thoughts? Reach out on [Twitter](https://twitter.com/saisridhartarra) or [LinkedIn](https://linkedin.com/in/saisridhartarra)._

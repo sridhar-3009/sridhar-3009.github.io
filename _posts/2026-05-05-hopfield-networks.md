@@ -148,6 +148,7 @@ One step of gradient descent on this energy gives:
 ```
 
 Unpack this:
+
 - `X^T × ξ` computes the dot-product similarity between the query and every stored pattern
 - `softmax(β × ...)` turns these into weights that sum to 1, concentrating weight on the most similar patterns
 - `X × [weights]` returns a weighted combination of stored patterns — a retrieved memory
@@ -176,12 +177,12 @@ Generalize the update rule to handle multiple simultaneous queries — a batch o
 
 Now add learnable linear projections — a standard trick for adding expressive power:
 
-| Hopfield concept | Transformer equivalent |
-|---|---|
-| Stored patterns X | Keys: K = X × W_K |
-| Query states Ξ | Queries: Q = Ξ × W_Q |
-| Patterns in output space | Values: V = X × W_V |
-| Inverse temperature β | Scaling factor: 1 / sqrt(d_k) |
+| Hopfield concept         | Transformer equivalent        |
+| ------------------------ | ----------------------------- |
+| Stored patterns X        | Keys: K = X × W_K             |
+| Query states Ξ           | Queries: Q = Ξ × W_Q          |
+| Patterns in output space | Values: V = X × W_V           |
+| Inverse temperature β    | Scaling factor: 1 / sqrt(d_k) |
 
 Substitute all of that in and you get:
 

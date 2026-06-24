@@ -215,11 +215,11 @@ The critical line is `repeat_interleave` — it takes group 1's K/V and assigns 
 
 **Real-world impact (Llama 3 70B, 128K context):**
 
-| Config | KV Heads | Cache Size |
-|---|---|---|
-| Standard MHA | 64 | 320 GB |
-| GQA (8 KV heads) | 8 | **40 GB** |
-| MQA | 1 | 5 GB |
+| Config           | KV Heads | Cache Size |
+| ---------------- | -------- | ---------- |
+| Standard MHA     | 64       | 320 GB     |
+| GQA (8 KV heads) | 8        | **40 GB**  |
+| MQA              | 1        | 5 GB       |
 
 40GB is actually manageable on a pair of A100s. Quality versus MHA: barely distinguishable on standard benchmarks. This is why **GQA is now the default** in every modern open-source model — Llama 2/3, Mistral, Gemma, Falcon 180B, Qwen, Phi. If you're building a transformer today, GQA is the starting point, not MHA.
 
@@ -278,12 +278,12 @@ Every token gets quantized as it enters the cache and dequantized just before th
 
 **Memory savings vs fp16:**
 
-| Precision | Bytes/value | Reduction |
-|---|---|---|
-| fp16 (baseline) | 2 | 1× |
-| int8 | 1 | 2× |
-| int4 | 0.5 | 4× |
-| int2 | 0.25 | 8× |
+| Precision       | Bytes/value | Reduction |
+| --------------- | ----------- | --------- |
+| fp16 (baseline) | 2           | 1×        |
+| int8            | 1           | 2×        |
+| int4            | 0.5         | 4×        |
+| int2            | 0.25        | 8×        |
 
 The 2024 **KVQuant** paper pushed this further with non-uniform quantization — instead of a uniform grid of integer values, it calibrates the grid shape per-channel to match the actual distribution of key/value vectors. Result: fp16-level perplexity at 2-bit precision. That's a 8× memory reduction with essentially zero quality loss.
 
@@ -449,7 +449,7 @@ Used by: **Mistral** (sliding window attention), **Gemma**, **Longformer**.
 
 ## Technique 6: SnapKV — Compress Before You Generate
 
-All the techniques above deal with the cache during generation — either evicting tokens as you go or using a fixed window. **SnapKV** takes a step back and asks: can we compress the cache *before* generation even starts?
+All the techniques above deal with the cache during generation — either evicting tokens as you go or using a fixed window. **SnapKV** takes a step back and asks: can we compress the cache _before_ generation even starts?
 
 When an LLM processes a long prompt (say, 50,000 tokens of context before generating an answer), it runs what's called a **prefill** step — a full forward pass over the entire prompt in parallel. During this prefill, every token attends to every other token, producing a full attention matrix.
 
@@ -509,12 +509,12 @@ GQA              → reduces number of K/V vectors stored
 
 Here's what that stacking does for **Llama 3 70B at 128K context**:
 
-| What's applied | Cache Size |
-|---|---|
-| Baseline MHA, fp16 | 320 GB |
-| + GQA (8 KV heads) | 40 GB |
-| + INT8 quantization | 20 GB |
-| + H2O (20% budget) | **4 GB** |
+| What's applied      | Cache Size |
+| ------------------- | ---------- |
+| Baseline MHA, fp16  | 320 GB     |
+| + GQA (8 KV heads)  | 40 GB      |
+| + INT8 quantization | 20 GB      |
+| + H2O (20% budget)  | **4 GB**   |
 
 From 320 GB to 4 GB. Same model. Same outputs (approximately). Now fits on a single A100 with room for the model weights too.
 
@@ -595,4 +595,4 @@ A **10× throughput gain** from the same GPU, same model, same weights. This is 
 
 ---
 
-*The context window arms race isn't about model capability — it's about memory engineering. Every extra token you can fit in context at the same VRAM budget is a capability gain. The teams winning on long context aren't necessarily building smarter models. They're building smarter caches.*
+_The context window arms race isn't about model capability — it's about memory engineering. Every extra token you can fit in context at the same VRAM budget is a capability gain. The teams winning on long context aren't necessarily building smarter models. They're building smarter caches._

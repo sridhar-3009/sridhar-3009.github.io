@@ -12,6 +12,7 @@ NLP-based pipeline to detect trending topics and analyze sentiment from streamin
 data in real time.
 
 **What I built:**
+
 - Stream processing pipeline to ingest and process social media data at scale
 - Sentiment classification using fine-tuned NLP models
 - Trending topic detection with time-decay weighting

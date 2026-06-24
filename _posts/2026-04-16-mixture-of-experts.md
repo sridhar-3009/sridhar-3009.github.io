@@ -258,15 +258,15 @@ Token dropping introduces a tricky training dynamic: the model must learn to be 
 
 Mixtral 8x7B uses 8 experts per MoE layer with top-2 routing. Every other transformer layer is an MoE layer (the rest are standard dense attention + FFN). The architecture:
 
-| Property | Value |
-|---|---|
-| Total parameters | 46.7B |
-| Active parameters per token | 12.9B |
-| Experts per MoE layer | 8 |
-| Active experts per token | 2 |
-| Hidden dimension | 4096 |
-| Expert FFN dimension | 14336 |
-| Layers | 32 (alternating dense/MoE) |
+| Property                    | Value                      |
+| --------------------------- | -------------------------- |
+| Total parameters            | 46.7B                      |
+| Active parameters per token | 12.9B                      |
+| Experts per MoE layer       | 8                          |
+| Active experts per token    | 2                          |
+| Hidden dimension            | 4096                       |
+| Expert FFN dimension        | 14336                      |
+| Layers                      | 32 (alternating dense/MoE) |
 
 The critical insight: **attention layers are dense** (all 12.9B active parameters), but the expert FFNs represent the bulk of "knowledge storage" — and only 2/8 = 25% of that storage is accessed per token.
 
@@ -326,15 +326,15 @@ DeepSeek's engineering contribution (described in their training paper) is a cus
 
 ## Dense vs. Sparse: When to Use Which
 
-| | Dense | MoE |
-|---|---|---|
-| Training FLOPs per token | High | Low |
-| Inference FLOPs per token | High | Low |
-| Memory (weights) | Low | High |
-| Training stability | High | Moderate (needs load balancing) |
-| Serving complexity | Simple | Complex (expert parallelism) |
-| Good for | Smaller models, simple serving | Frontier scale, research |
-| Bad for | Frontier scale (too expensive) | Edge/mobile deployment |
+|                           | Dense                          | MoE                             |
+| ------------------------- | ------------------------------ | ------------------------------- |
+| Training FLOPs per token  | High                           | Low                             |
+| Inference FLOPs per token | High                           | Low                             |
+| Memory (weights)          | Low                            | High                            |
+| Training stability        | High                           | Moderate (needs load balancing) |
+| Serving complexity        | Simple                         | Complex (expert parallelism)    |
+| Good for                  | Smaller models, simple serving | Frontier scale, research        |
+| Bad for                   | Frontier scale (too expensive) | Edge/mobile deployment          |
 
 The crossover point is roughly 30–70B parameters: below that, dense is simpler and sufficient; above that, MoE becomes the only economically viable path to higher capability.
 
@@ -397,4 +397,4 @@ The crossover point is roughly 30–70B parameters: below that, dense is simpler
 
 ---
 
-*MoE is a bet on a simple idea: not every token needs the same computation. The remarkable thing is how much that bet pays off. A model that thinks selectively — routing each token to relevant specialists, ignoring the rest — turns out to be both more capable and cheaper to run than one that applies maximum force to everything. Intelligence, apparently, is less about brute force and more about knowing when not to think.*
+_MoE is a bet on a simple idea: not every token needs the same computation. The remarkable thing is how much that bet pays off. A model that thinks selectively — routing each token to relevant specialists, ignoring the rest — turns out to be both more capable and cheaper to run than one that applies maximum force to everything. Intelligence, apparently, is less about brute force and more about knowing when not to think._

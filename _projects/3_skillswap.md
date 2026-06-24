@@ -12,6 +12,7 @@ Full-stack real-time learning platform where users earn credits by teaching and 
 while learning — a peer-to-peer economy for skills.
 
 **What I built:**
+
 - Live 1:1 video + collaborative whiteboard sessions via WebRTC
 - Transactional credit system — earn by teaching, spend to learn
 - Booking system with scheduling, ratings, and reputation tracking

@@ -26,6 +26,7 @@ AI Agent → MCP Server → Tools / External APIs
 ```
 
 Three actors:
+
 - **AI Agent** — the LLM runtime (Claude, GPT-4, your own agent loop) that decides which tool to call
 - **MCP Server** — your FastAPI app that exposes tools as HTTP endpoints
 - **Tools** — functions that do real work: fetch weather, query a database, send a Slack message
@@ -141,8 +142,8 @@ Response:
 {
   "tool": "users",
   "data": [
-    {"id": 1, "name": "Rahul"},
-    {"id": 2, "name": "Priya"}
+    { "id": 1, "name": "Rahul" },
+    { "id": 2, "name": "Priya" }
   ]
 }
 ```
@@ -256,4 +257,4 @@ Same pattern in every case: define the tool, expose it as an endpoint, register 
 
 ---
 
-*The agent is the brain. Your MCP server is the hands. Getting the interface between them right — clean endpoints, honest tool descriptions, fast responses — is what separates a demo from a system.*
+_The agent is the brain. Your MCP server is the hands. Getting the interface between them right — clean endpoints, honest tool descriptions, fast responses — is what separates a demo from a system._

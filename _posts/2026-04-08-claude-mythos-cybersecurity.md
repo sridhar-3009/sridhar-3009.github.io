@@ -44,6 +44,7 @@ To understand Mythos, you first need to understand why Anthropic announced it th
 The explicit goal: ensure that AI's most powerful security capabilities reach defenders before attackers. Anthropic describes it as "an urgent attempt" — the language is deliberate. They believe a model capable of what Mythos can do is coming regardless of whether Anthropic builds it. The question is who gets it first.
 
 **Commitments made at launch:**
+
 - **$100 million** in Mythos usage credits to Project Glasswing partners
 - **$4 million** in usage credits to open-source security organizations
 - Active development of cybersecurity safeguards to detect and block the model's most dangerous outputs
@@ -69,7 +70,7 @@ Mythos can find vulnerabilities that human reviewers and automated tools have mi
 
 - **Linux kernel privilege escalation** — Mythos autonomously identified and chained multiple separate vulnerabilities in the Linux kernel to achieve privilege escalation, without any human guidance or steering at any step.
 
-The phrase "entirely autonomously, without any human steering" appears in Anthropic's own description. This is not a model that helps a human security researcher — it is a model that *is* the security researcher, working independently.
+The phrase "entirely autonomously, without any human steering" appears in Anthropic's own description. This is not a model that helps a human security researcher — it is a model that _is_ the security researcher, working independently.
 
 ### Agentic Code Execution
 
@@ -83,13 +84,13 @@ Beyond cybersecurity, Mythos is simply a more capable general reasoner than anyt
 
 ## Benchmark Performance
 
-| Benchmark | Mythos Preview | Claude Opus 4.6 | Delta |
-|-----------|---------------|-----------------|-------|
-| **CyberGym** (Vulnerability Reproduction) | **83.1%** | 66.6% | +16.5 pts |
-| **SWE-bench Pro** (Real-world coding) | **77.8%** | 53.4% | +24.4 pts |
-| **SWE-bench Verified** | **93.9%** | 80.8% | +13.1 pts |
-| **Terminal-Bench 2.0** | **82.0%** | 65.4% | +16.6 pts |
-| **GPQA Diamond** (Graduate reasoning) | **94.6%** | 91.3% | +3.3 pts |
+| Benchmark                                 | Mythos Preview | Claude Opus 4.6 | Delta     |
+| ----------------------------------------- | -------------- | --------------- | --------- |
+| **CyberGym** (Vulnerability Reproduction) | **83.1%**      | 66.6%           | +16.5 pts |
+| **SWE-bench Pro** (Real-world coding)     | **77.8%**      | 53.4%           | +24.4 pts |
+| **SWE-bench Verified**                    | **93.9%**      | 80.8%           | +13.1 pts |
+| **Terminal-Bench 2.0**                    | **82.0%**      | 65.4%           | +16.6 pts |
+| **GPQA Diamond** (Graduate reasoning)     | **94.6%**      | 91.3%           | +3.3 pts  |
 
 A few things stand out:
 
@@ -105,12 +106,12 @@ A few things stand out:
 
 Claude currently has three publicly available tiers, plus Mythos as a restricted preview:
 
-| Model | Context | Pricing (in/out per MTok) | Best For |
-|-------|---------|--------------------------|----------|
-| **Claude Haiku 4.5** | 200k tokens | $1 / $5 | Speed, high-volume tasks |
-| **Claude Sonnet 4.6** | 1M tokens | $3 / $15 | Balanced speed + intelligence |
-| **Claude Opus 4.6** | 1M tokens | $5 / $25 | Complex reasoning, agentic tasks |
-| **Claude Mythos Preview** | TBD | $25 / $125 | Cybersecurity, frontier capability |
+| Model                     | Context     | Pricing (in/out per MTok) | Best For                           |
+| ------------------------- | ----------- | ------------------------- | ---------------------------------- |
+| **Claude Haiku 4.5**      | 200k tokens | $1 / $5                   | Speed, high-volume tasks           |
+| **Claude Sonnet 4.6**     | 1M tokens   | $3 / $15                  | Balanced speed + intelligence      |
+| **Claude Opus 4.6**       | 1M tokens   | $5 / $25                  | Complex reasoning, agentic tasks   |
+| **Claude Mythos Preview** | TBD         | $25 / $125                | Cybersecurity, frontier capability |
 
 Mythos sits at 5x the price of Opus 4.6 — and based on the benchmark numbers, earns it for the right workloads.
 
@@ -176,21 +177,24 @@ This mirrors how the rest of the Claude family has evolved: capabilities that re
 ## Further Reading
 
 ### Official Anthropic Sources
+
 - **[Project Glasswing — anthropic.com/glasswing](https://www.anthropic.com/glasswing)** — Official announcement, partner list, and access information
 - **[Claude Models Overview](https://platform.claude.com/docs/en/docs/about-claude/models/overview)** — Full model comparison table including Mythos Preview details
 - **[Anthropic's Core Views on AI Safety](https://www.anthropic.com/research)** — The safety philosophy behind decisions like the Mythos restricted release
 
 ### Background on AI in Cybersecurity
+
 - **[NIST Cybersecurity Framework](https://www.nist.gov/cyberframework)** — The standards framework that defensive security work is built on
 - **[Common Vulnerabilities and Exposures (CVE)](https://cve.mitre.org/)** — The database of publicly disclosed vulnerabilities. Mythos-class models change how these get found.
 - **[SWE-bench Leaderboard](https://www.swebench.com/)** — Live benchmark tracking for AI on real software engineering tasks
 - **[GPQA: A Graduate-Level Benchmark](https://arxiv.org/abs/2311.12022)** — The paper behind the GPQA Diamond benchmark used to evaluate Mythos
 
 ### Dual-Use AI and Policy
+
 - **[The Dual-Use Dilemma in AI](https://www.brookings.edu/articles/the-dual-use-dilemma/)** — Brookings analysis of AI capabilities that are simultaneously defensive and offensive
 - **[Anthropic's Responsible Scaling Policy](https://www.anthropic.com/responsible-scaling-policy)** — The policy framework that governs when and how Anthropic deploys frontier capabilities
 - **[AI Safety Levels (ASL)](https://www.anthropic.com/research/core-views-on-ai-safety)** — Anthropic's internal framework for assessing and managing model risk before deployment
 
 ---
 
-*Claude Mythos is the clearest signal yet that frontier AI capabilities are outpacing the safety infrastructure needed to deploy them broadly. Anthropic's choice to restrict it rather than release it is either responsible restraint or an elaborate delay — probably both. Either way, the gap between what the most capable AI can do and what the public has access to just got measurably wider.*
+_Claude Mythos is the clearest signal yet that frontier AI capabilities are outpacing the safety infrastructure needed to deploy them broadly. Anthropic's choice to restrict it rather than release it is either responsible restraint or an elaborate delay — probably both. Either way, the gap between what the most capable AI can do and what the public has access to just got measurably wider._

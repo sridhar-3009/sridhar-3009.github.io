@@ -27,7 +27,7 @@ That last part is what makes this paper worth a deep read.
 - Trained on **1,000+ hours of fMRI** across **720 subjects** — one of the largest aggregations in brain modeling
 - Beats strong linear baselines by learning **nonlinear cross-modal interactions**
 - Generalizes **zero-shot to unseen subjects** — predicts group-level responses before any new data collection
-- Reproduces **FFA, PPA, EBA, VWFA** and language network localizers *in silico*
+- Reproduces **FFA, PPA, EBA, VWFA** and language network localizers _in silico_
 - Hints at a new research workflow: **simulate → refine → then scan**
 
 ---
@@ -79,12 +79,12 @@ This is a major shift from voxel-wise encoding pipelines — the standard approa
 
 Scale is not a footnote here. It's the foundation.
 
-| Dataset type | Details |
-|---|---|
-| Total fMRI data | 1,000+ hours |
-| Subjects | 720 individuals |
-| Dataset types | Deep (many sessions/subject) + Wide (many subjects, fewer sessions) |
-| Stimulus types | Movies, podcasts, multimodal narratives |
+| Dataset type    | Details                                                             |
+| --------------- | ------------------------------------------------------------------- |
+| Total fMRI data | 1,000+ hours                                                        |
+| Subjects        | 720 individuals                                                     |
+| Dataset types   | Deep (many sessions/subject) + Wide (many subjects, fewer sessions) |
+| Stimulus types  | Movies, podcasts, multimodal narratives                             |
 
 Aggregating this much fragmented neuroscience data into one modeling setup is itself a contribution. No individual lab has collected anything close to this in one place.
 
@@ -100,7 +100,7 @@ That sounds like it should just work automatically — but it doesn't in naive m
 
 ### It Beats Linear Baselines — For the Right Reason
 
-The authors compare against **Deep FIR** — an optimized linear encoding pipeline using the *same pretrained embeddings*. This is the honest comparison. It isolates whether the transformer architecture is doing anything beyond better input features.
+The authors compare against **Deep FIR** — an optimized linear encoding pipeline using the _same pretrained embeddings_. This is the honest comparison. It isolates whether the transformer architecture is doing anything beyond better input features.
 
 It is. TRIBE v2 outperforms the linear baseline significantly across datasets, meaning the nonlinear cross-modal interactions are genuinely adding value — not just free-riding on stronger representations.
 
@@ -142,12 +142,12 @@ They simulate visual functional localizer experiments using controlled categorie
 
 TRIBE v2 recovers the expected brain regions:
 
-| Category | Brain region recovered |
-|---|---|
-| Faces | FFA — Fusiform Face Area |
-| Places | PPA — Parahippocampal Place Area |
-| Bodies | EBA — Extrastriate Body Area |
-| Words | VWFA — Visual Word Form Area |
+| Category | Brain region recovered           |
+| -------- | -------------------------------- |
+| Faces    | FFA — Fusiform Face Area         |
+| Places   | PPA — Parahippocampal Place Area |
+| Bodies   | EBA — Extrastriate Body Area     |
+| Words    | VWFA — Visual Word Form Area     |
 
 These are landmarks of cognitive neuroscience, established over decades of carefully controlled human experiments. A model reproducing them from simulated predictions is not just passing a benchmark — it's demonstrating structural alignment with the field's validated knowledge.
 

@@ -34,6 +34,7 @@ The core of Claude Code — and every serious agentic coding tool — is decepti
 ```
 
 That's it. The magic is entirely in:
+
 - **What tools you give the model** (bash, file read/write, grep, glob, web fetch...)
 - **How you manage context** (what you include, what you truncate, how you represent tool results)
 - **The quality of your system prompt**
@@ -77,6 +78,7 @@ Both `AnthropicProvider` and `OllamaProvider` implement this. Swap the provider,
 The send-stream-tools-repeat loop from above, implemented cleanly:
 
 {% raw %}
+
 ```go
 func (a *Agent) Run(ctx context.Context, task string) error {
     messages := []Message{{Role: "user", Content: task}}
@@ -84,7 +86,7 @@ func (a *Agent) Run(ctx context.Context, task string) error {
     for {
         events, err := a.provider.Chat(ctx, messages, a.tools)
         // ... stream events
-        
+
         if len(toolCalls) == 0 {
             break // model is done
         }
@@ -97,23 +99,24 @@ func (a *Agent) Run(ctx context.Context, task string) error {
     return nil
 }
 ```
+
 {% endraw %}
 
 ### 3. The 16 Built-in Tools
 
-| Tool | What it does |
-|------|-------------|
-| `bash` | Execute shell commands |
-| `read_file` | Read file contents |
-| `write_file` | Create or overwrite files |
-| `edit_file` | Targeted string replacement (preserves context) |
-| `grep` | Regex search across files |
-| `glob` | File pattern matching |
-| `web_fetch` | Fetch and summarize web pages |
-| `git_diff` | Get staged/unstaged diffs |
-| `list_dir` | Directory listing |
-| `todo_write` | Manage task lists |
-| + 6 more | Notebook, task tracking, etc. |
+| Tool         | What it does                                    |
+| ------------ | ----------------------------------------------- |
+| `bash`       | Execute shell commands                          |
+| `read_file`  | Read file contents                              |
+| `write_file` | Create or overwrite files                       |
+| `edit_file`  | Targeted string replacement (preserves context) |
+| `grep`       | Regex search across files                       |
+| `glob`       | File pattern matching                           |
+| `web_fetch`  | Fetch and summarize web pages                   |
+| `git_diff`   | Get staged/unstaged diffs                       |
+| `list_dir`   | Directory listing                               |
+| `todo_write` | Manage task lists                               |
+| + 6 more     | Notebook, task tracking, etc.                   |
 
 This is essentially the same tool surface as Claude Code. The model uses them identically because they're described the same way in the system prompt.
 
@@ -170,11 +173,11 @@ FORGE_PROVIDER=ollama forge review --staged
 
 ### Model Recommendations for Offline Use
 
-| Model | Size | Best for |
-|-------|------|----------|
-| `llama3.2` | 2GB | General chat, quick tasks |
-| `qwen2.5-coder:7b` | 4GB | Code review, editing (recommended) |
-| `deepseek-coder-v2` | 8GB | Large codebases, complex refactors |
+| Model               | Size | Best for                           |
+| ------------------- | ---- | ---------------------------------- |
+| `llama3.2`          | 2GB  | General chat, quick tasks          |
+| `qwen2.5-coder:7b`  | 4GB  | Code review, editing (recommended) |
+| `deepseek-coder-v2` | 8GB  | Large codebases, complex refactors |
 
 ---
 
@@ -195,10 +198,10 @@ FORGE_PROVIDER=ollama forge review --staged
 Drop a `~/.config/forge/config.yaml` if you want persistent settings:
 
 ```yaml
-provider: ollama          # or "anthropic"
+provider: ollama # or "anthropic"
 ollama_model: qwen2.5-coder:7b
 max_tokens: 8096
-auto_approve: false       # set true to skip tool-execution confirmations
+auto_approve: false # set true to skip tool-execution confirmations
 ```
 
 Or use environment variables for one-off overrides:

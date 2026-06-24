@@ -17,7 +17,7 @@ The naive version is simple: chunk your documents into paragraphs, embed them wi
 
 This works. Up to a point.
 
-Then you discover that your retrieval misses the most relevant documents 30% of the time. That questions about relationships between entities fail completely. That the 500-token chunks you split on periods don't align with how your model reasons. That users asking "what did the CEO say about layoffs last quarter?" get back chunks about layoffs from three years ago because the embeddings didn't capture *recency*.
+Then you discover that your retrieval misses the most relevant documents 30% of the time. That questions about relationships between entities fail completely. That the 500-token chunks you split on periods don't align with how your model reasons. That users asking "what did the CEO say about layoffs last quarter?" get back chunks about layoffs from three years ago because the embeddings didn't capture _recency_.
 
 The gap between naive RAG and production RAG is wide. This post covers the techniques that close it: **HyDE**, **reranking**, **ColBERT**, and **Graph RAG** — with implementations you can actually use.
 
@@ -28,13 +28,13 @@ The gap between naive RAG and production RAG is wide. This post covers the techn
 Before fixing things, name what's broken:
 
 **1. Query-document mismatch**
-Queries are short and abstract ("what causes transformer training instability?"). Documents are long and concrete (a paragraph describing gradient norms spiking due to attention softmax saturation). Their embeddings live in different regions of the vector space — not because the content is unrelated, but because the *linguistic form* is different.
+Queries are short and abstract ("what causes transformer training instability?"). Documents are long and concrete (a paragraph describing gradient norms spiking due to attention softmax saturation). Their embeddings live in different regions of the vector space — not because the content is unrelated, but because the _linguistic form_ is different.
 
 **2. Single-vector bottleneck**
 A single embedding vector must compress an entire 512-token chunk. Complex chunks that discuss multiple concepts average their meaning into one point — and retrieval can fail on any of those concepts individually.
 
 **3. Semantic similarity ≠ relevance**
-The most semantically similar chunk isn't always the most useful one. A question about a drug's side effects might return chunks that are topically related but don't actually answer the question. Relevance requires understanding the *intent* of the query, not just its words.
+The most semantically similar chunk isn't always the most useful one. A question about a drug's side effects might return chunks that are topically related but don't actually answer the question. Relevance requires understanding the _intent_ of the query, not just its words.
 
 **4. Flat document structure**
 Documents have structure — sections, subsections, tables, references between chapters. Chunking destroys this. A chunk about "revenue" in Q3 earnings doesn't know it's three paragraphs after the CFO's statement that preceded it.
@@ -45,7 +45,7 @@ Each of these has a targeted fix.
 
 ## Fix 1: HyDE — Query the Way Documents Answer
 
-**Hypothetical Document Embeddings** (HyDE) attacks the query-document mismatch directly. Instead of embedding the raw query, you ask an LLM to *generate a hypothetical document that would answer the query* — then embed that hypothetical document and use it for retrieval.
+**Hypothetical Document Embeddings** (HyDE) attacks the query-document mismatch directly. Instead of embedding the raw query, you ask an LLM to _generate a hypothetical document that would answer the query_ — then embed that hypothetical document and use it for retrieval.
 
 The intuition: a generated answer paragraph lives in the same linguistic register as real document chunks. Embedding it retrieves documents that look like answers, not documents that look like questions.
 
@@ -112,7 +112,7 @@ Query → Dense Retrieval (fast, recall-focused) → Top 50 candidates
                                                Top 5 reranked results → LLM
 ```
 
-The reranker sees both query and document simultaneously — it can model their *interaction*, not just their individual semantics. This catches relevance signals that embedding similarity misses entirely.
+The reranker sees both query and document simultaneously — it can model their _interaction_, not just their individual semantics. This catches relevance signals that embedding similarity misses entirely.
 
 ```python
 from sentence_transformers import CrossEncoder
@@ -142,12 +142,12 @@ class TwoStageRetriever:
 
 **Reranker model options:**
 
-| Model | Size | Speed | Quality |
-|---|---|---|---|
-| `cross-encoder/ms-marco-MiniLM-L-6-v2` | 22M | Fast | Good baseline |
-| `cross-encoder/ms-marco-MiniLM-L-12-v2` | 33M | Moderate | Better |
-| `BAAI/bge-reranker-v2-m3` | 568M | Slow | Excellent |
-| Cohere Rerank API | — | API call | Production-grade |
+| Model                                   | Size | Speed    | Quality          |
+| --------------------------------------- | ---- | -------- | ---------------- |
+| `cross-encoder/ms-marco-MiniLM-L-6-v2`  | 22M  | Fast     | Good baseline    |
+| `cross-encoder/ms-marco-MiniLM-L-12-v2` | 33M  | Moderate | Better           |
+| `BAAI/bge-reranker-v2-m3`               | 568M | Slow     | Excellent        |
+| Cohere Rerank API                       | —    | API call | Production-grade |
 
 The initial_k / final_k ratio matters: retrieve 50, rerank to 5. If you retrieve too few initially, the reranker can't save you — the relevant document was never in the candidate set. If you rerank too many, latency explodes. 30–100 → 3–10 is the typical production range.
 
@@ -354,9 +354,9 @@ def graph_rag_retrieve(query: str, graph: nx.DiGraph, vector_store, top_k: int =
 
 ### Why Graph RAG Wins on Relationship Queries
 
-Consider a corpus of earnings call transcripts. The question: *"How has the relationship between Amazon's AWS margins and its advertising revenue changed over the past three years?"*
+Consider a corpus of earnings call transcripts. The question: _"How has the relationship between Amazon's AWS margins and its advertising revenue changed over the past three years?"_
 
-Vector retrieval returns chunks that mention AWS margins and chunks that mention advertising revenue — independently. It has no way to represent the *relationship between these two things over time* without explicit graph structure connecting them.
+Vector retrieval returns chunks that mention AWS margins and chunks that mention advertising revenue — independently. It has no way to represent the _relationship between these two things over time_ without explicit graph structure connecting them.
 
 Graph RAG extracts `AWS_Margins --[affects]--> Advertising_Investment`, `Advertising_Revenue --[grew_by]--> 27%_in_Q3_2024`, and so on. Traversing from the query entities gives back the entire chain of relationships — exactly what the question is asking for.
 
@@ -559,4 +559,4 @@ def semantic_chunk(text: str, threshold: float = 0.3) -> list[str]:
 
 ---
 
-*Naive RAG is a prototype. Production RAG is a system. The difference isn't any single technique — it's building a retrieval stack that thinks about where each failure mode comes from and applies the right fix at the right layer. Get that right, and your LLM stops hallucinating not because you made it smarter, but because you stopped giving it reasons to guess.*
+_Naive RAG is a prototype. Production RAG is a system. The difference isn't any single technique — it's building a retrieval stack that thinks about where each failure mode comes from and applies the right fix at the right layer. Get that right, and your LLM stops hallucinating not because you made it smarter, but because you stopped giving it reasons to guess._

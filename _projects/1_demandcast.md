@@ -12,6 +12,7 @@ End-to-end demand forecasting system for predicting daily SKU-level demand acros
 comparing classical and deep learning approaches.
 
 **What I built:**
+
 - Benchmarked ARIMA, Prophet, XGBoost, and LSTM — LSTM with Temporal Attention won with **22% lower MAPE** vs ARIMA baseline
 - Real-time inference API with FastAPI + Redis caching for sub-100ms predictions
 - Kafka-based streaming pipeline to ingest live sales data
@@ -19,8 +20,8 @@ comparing classical and deep learning approaches.
 
 **Tech stack:** Python · PyTorch · XGBoost · FastAPI · Kafka · Redis · PostgreSQL
 
-| Metric | Value |
-|--------|-------|
-| MAPE improvement | 22% |
-| Products modeled | 50K+ |
-| Status | Ongoing |
+| Metric           | Value   |
+| ---------------- | ------- |
+| MAPE improvement | 22%     |
+| Products modeled | 50K+    |
+| Status           | Ongoing |

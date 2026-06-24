@@ -15,7 +15,7 @@ Most people learning about neural networks are taught a clean story: train a net
 
 This story is mostly **wrong** — and the reality is far stranger, more elegant, and more alarming.
 
-In 2022, Anthropic researchers published *"Toy Models of Superposition"*, a paper that quietly shook the foundations of mechanistic interpretability. Their finding: **neural networks routinely store far more features than they have neurons**, by encoding multiple concepts in the same neurons simultaneously, using the geometry of high-dimensional space as a compression trick.
+In 2022, Anthropic researchers published _"Toy Models of Superposition"_, a paper that quietly shook the foundations of mechanistic interpretability. Their finding: **neural networks routinely store far more features than they have neurons**, by encoding multiple concepts in the same neurons simultaneously, using the geometry of high-dimensional space as a compression trick.
 
 This post unpacks what that means, how it works mathematically, and why it has enormous implications for AI safety and interpretability.
 
@@ -36,6 +36,7 @@ It cheats. Brilliantly.
 When you look at real neurons in large models, you find something uncomfortable: **a single neuron fires for wildly unrelated things**.
 
 A famous example from GPT-2 analysis: neuron `#2747` in a specific MLP layer activates strongly for:
+
 - The word "banana"
 - Code comments containing `//`
 - References to basketball
@@ -48,11 +49,11 @@ This immediately breaks a key assumption of interpretability: if neurons aren't 
 
 ## The Superposition Hypothesis
 
-Anthropic's researchers asked: *why* does polysemanticity happen? Their answer is the **superposition hypothesis**.
+Anthropic's researchers asked: _why_ does polysemanticity happen? Their answer is the **superposition hypothesis**.
 
 The core idea: **a network with `n` neurons can represent up to `exp(n)` features** — not just `n` — if it accepts some interference between features. The network trades precision for capacity.
 
-Here's the intuition. Consider two vectors in high-dimensional space. If they're perfectly orthogonal (at 90°), they don't interfere with each other at all. But if you have more features than dimensions, you can't keep everything orthogonal. Instead, you pack features into *nearly orthogonal* directions — vectors that are only slightly correlated.
+Here's the intuition. Consider two vectors in high-dimensional space. If they're perfectly orthogonal (at 90°), they don't interfere with each other at all. But if you have more features than dimensions, you can't keep everything orthogonal. Instead, you pack features into _nearly orthogonal_ directions — vectors that are only slightly correlated.
 
 The **Johnson-Lindenstrauss Lemma** from mathematics tells us that you can embed `m` points in `O(log m / ε²)` dimensions while preserving all pairwise distances up to factor `(1 ± ε)`. For neural networks, this means: with 4096 dimensions, you can represent **tens of thousands of features** with only small mutual interference, as long as features are sparse — i.e., most features are inactive at any given time.
 
@@ -122,6 +123,7 @@ This is a foundational problem for mechanistic interpretability — the field tr
 Anthropic's follow-up work, **"Towards Monosemanticity"** (2023), used sparse autoencoders (SAEs) to decompose superposed representations back into interpretable features. They found ~50,000 distinct features inside a single-layer transformer — vastly more than its neuron count.
 
 Some of these features were remarkably clean:
+
 - "the model is currently tracking a list"
 - "this token is part of a DNA sequence"
 - "the context involves deception"
@@ -216,7 +218,7 @@ We don't yet know how to fully solve it. But we know it exists, we know why it h
   Documents the "grokking" phenomenon: networks that perfectly memorize training data eventually undergo a phase transition and learn the true underlying algorithm. Completely counterintuitive.
 
 - **[Progress Measures for Grokking via Mechanistic Interpretability](https://arxiv.org/abs/2301.05217)** — Nanda et al. (2023)
-  Reverse-engineers *how* a network learns modular arithmetic, identifying the exact Fourier-basis algorithm the network discovers. One of the most complete circuit analyses ever done.
+  Reverse-engineers _how_ a network learns modular arithmetic, identifying the exact Fourier-basis algorithm the network discovers. One of the most complete circuit analyses ever done.
 
 ### Tools & Libraries
 
@@ -242,4 +244,4 @@ We don't yet know how to fully solve it. But we know it exists, we know why it h
 
 ---
 
-*The most important things happening in AI are often not the capabilities — they're the discoveries about what's already inside the models we've built. Superposition is one of those discoveries. It changes what questions we ask, what we trust, and what we fear.*
+_The most important things happening in AI are often not the capabilities — they're the discoveries about what's already inside the models we've built. Superposition is one of those discoveries. It changes what questions we ask, what we trust, and what we fear._

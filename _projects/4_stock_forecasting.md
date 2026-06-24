@@ -9,9 +9,10 @@ github: https://github.com/sridhar-3009/Explainable-Stock-Forecasting-Engine
 ---
 
 Stock price forecasting system focused on explainability and transparency — not just predicting
-prices, but understanding *why* the model made each prediction.
+prices, but understanding _why_ the model made each prediction.
 
 **What I built:**
+
 - Feature importance analysis using SHAP values to interpret model decisions
 - Ensemble of ML models benchmarked on historical financial data
 - Visualization of feature impact across different market conditions

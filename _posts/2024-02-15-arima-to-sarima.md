@@ -15,24 +15,24 @@ Time-series forecasting is the task of predicting future values using past obser
 
 Examples include:
 
-- Daily sales forecasting  
-- Stock price prediction  
-- Electricity demand forecasting  
-- Website traffic prediction  
+- Daily sales forecasting
+- Stock price prediction
+- Electricity demand forecasting
+- Website traffic prediction
 
 Time-series data differs from standard machine learning data because:
 
-1. Order matters  
-2. Observations are time-dependent  
-3. Shuffling destroys information  
+1. Order matters
+2. Observations are time-dependent
+3. Shuffling destroys information
 
 This article builds a clear understanding of:
 
-- How ARIMA works  
-- How LSTM works  
-- Mathematical intuition behind both  
-- When to use each  
-- Common mistakes in practice  
+- How ARIMA works
+- How LSTM works
+- Mathematical intuition behind both
+- When to use each
+- Common mistakes in practice
 
 ---
 
@@ -60,9 +60,9 @@ A forecasting model must capture these structures effectively.
 
 ARIMA stands for:
 
-AR  = AutoRegressive  
-I   = Integrated  
-MA  = Moving Average  
+AR = AutoRegressive  
+I = Integrated  
+MA = Moving Average
 
 It is written as ARIMA(p, d, q).
 
@@ -70,7 +70,7 @@ Where:
 
 p = number of autoregressive terms  
 d = number of differences applied  
-q = number of moving average terms  
+q = number of moving average terms
 
 ---
 
@@ -80,14 +80,14 @@ The AR component assumes that the current value depends on previous values.
 
 The mathematical form is:
 
-y_t = c + φ₁ y_{t-1} + φ₂ y_{t-2} + ... + φ_p y_{t-p} + ε_t
+y*t = c + φ₁ y*{t-1} + φ₂ y*{t-2} + ... + φ_p y*{t-p} + ε_t
 
 Where:
 
-- y_t is the value at time t  
-- c is a constant  
-- φ are coefficients  
-- ε_t is white noise  
+- y_t is the value at time t
+- c is a constant
+- φ are coefficients
+- ε_t is white noise
 
 This is a linear relationship between past and present values.
 
@@ -99,9 +99,9 @@ Time-series models require stationarity.
 
 A stationary series has:
 
-- Constant mean  
-- Constant variance  
-- No long-term trend  
+- Constant mean
+- Constant variance
+- No long-term trend
 
 To remove trend, we apply differencing:
 
@@ -121,7 +121,7 @@ The MA part models dependence on past error terms.
 
 Its form is:
 
-y_t = ε_t + θ₁ ε_{t-1} + θ₂ ε_{t-2} + ... + θ_q ε_{t-q}
+y*t = ε_t + θ₁ ε*{t-1} + θ₂ ε*{t-2} + ... + θ_q ε*{t-q}
 
 This smooths the residual noise.
 
@@ -145,17 +145,17 @@ print(forecast)
 
 ARIMA performs well when:
 
-- Dataset is small to medium  
-- Patterns are mostly linear  
-- Seasonality is simple  
-- Interpretability is required  
-- Quick baseline is needed  
+- Dataset is small to medium
+- Patterns are mostly linear
+- Seasonality is simple
+- Interpretability is required
+- Quick baseline is needed
 
 Limitations:
 
-- Cannot capture strong non-linearity  
-- Struggles with many input variables  
-- Limited ability for long-term complex dependencies  
+- Cannot capture strong non-linearity
+- Struggles with many input variables
+- Limited ability for long-term complex dependencies
 
 ---
 
@@ -167,10 +167,10 @@ It is a special type of Recurrent Neural Network (RNN).
 
 Unlike ARIMA, LSTM:
 
-- Learns non-linear relationships  
-- Captures long-term dependencies  
-- Works with multiple features  
-- Scales better with large datasets  
+- Learns non-linear relationships
+- Captures long-term dependencies
+- Works with multiple features
+- Scales better with large datasets
 
 ---
 
@@ -182,16 +182,16 @@ Time-series requires sequential memory.
 
 LSTM introduces memory using:
 
-- Cell state  
-- Forget gate  
-- Input gate  
-- Output gate  
+- Cell state
+- Forget gate
+- Input gate
+- Output gate
 
 These gates regulate what information is:
 
-- Stored  
-- Updated  
-- Discarded  
+- Stored
+- Updated
+- Discarded
 
 ---
 
@@ -201,23 +201,23 @@ At time step t:
 
 Forget gate:
 
-f_t = σ(W_f x_t + U_f h_{t-1} + b_f)
+f*t = σ(W_f x_t + U_f h*{t-1} + b_f)
 
 Input gate:
 
-i_t = σ(W_i x_t + U_i h_{t-1} + b_i)
+i*t = σ(W_i x_t + U_i h*{t-1} + b_i)
 
 Candidate state:
 
-C̃_t = tanh(W_c x_t + U_c h_{t-1} + b_c)
+C̃*t = tanh(W_c x_t + U_c h*{t-1} + b_c)
 
 Updated cell state:
 
-C_t = f_t ⊙ C_{t-1} + i_t ⊙ C̃_t
+C*t = f_t ⊙ C*{t-1} + i_t ⊙ C̃_t
 
 Output gate:
 
-o_t = σ(W_o x_t + U_o h_{t-1} + b_o)
+o*t = σ(W_o x_t + U_o h*{t-1} + b_o)
 
 Hidden state:
 
@@ -225,10 +225,10 @@ h_t = o_t ⊙ tanh(C_t)
 
 Where:
 
-- σ is the sigmoid function  
-- ⊙ denotes element-wise multiplication  
-- x_t is input  
-- h_t is hidden state  
+- σ is the sigmoid function
+- ⊙ denotes element-wise multiplication
+- x_t is input
+- h_t is hidden state
 
 This structure enables long-term memory retention.
 
@@ -282,15 +282,15 @@ Use last 30 time steps to predict next value.
 
 # 9. ARIMA vs LSTM Comparison
 
-| Feature | ARIMA | LSTM |
-|----------|--------|--------|
-| Data Size | Small | Medium to Large |
-| Interpretability | High | Low |
-| Non-linearity | No | Yes |
-| Multivariate Support | Limited | Strong |
-| Training Speed | Fast | Slower |
-| Computational Cost | Low | Higher |
-| Long-Term Memory | Weak | Strong |
+| Feature              | ARIMA   | LSTM            |
+| -------------------- | ------- | --------------- |
+| Data Size            | Small   | Medium to Large |
+| Interpretability     | High    | Low             |
+| Non-linearity        | No      | Yes             |
+| Multivariate Support | Limited | Strong          |
+| Training Speed       | Fast    | Slower          |
+| Computational Cost   | Low     | Higher          |
+| Long-Term Memory     | Weak    | Strong          |
 
 ---
 
@@ -301,13 +301,13 @@ In real-world systems:
 Step 1: Build ARIMA baseline  
 Step 2: Try gradient boosting (XGBoost often strong for tabular)  
 Step 3: Train LSTM  
-Step 4: Compare using objective metrics  
+Step 4: Compare using objective metrics
 
 Common metrics:
 
-- MAE (Mean Absolute Error)  
-- RMSE (Root Mean Squared Error)  
-- MAPE (Mean Absolute Percentage Error)  
+- MAE (Mean Absolute Error)
+- RMSE (Root Mean Squared Error)
+- MAPE (Mean Absolute Percentage Error)
 
 Do not assume deep learning is superior without evidence.
 
@@ -315,11 +315,11 @@ Do not assume deep learning is superior without evidence.
 
 # 11. Common Beginner Mistakes
 
-1. Random train-test split  
-2. Ignoring seasonality  
-3. Data leakage  
-4. No baseline comparison  
-5. Not normalizing data for LSTM  
+1. Random train-test split
+2. Ignoring seasonality
+3. Data leakage
+4. No baseline comparison
+5. Not normalizing data for LSTM
 
 Correct chronological split:
 
@@ -342,18 +342,18 @@ Neither is universally superior.
 
 The correct choice depends on:
 
-- Data size  
-- Pattern complexity  
-- Interpretability requirements  
-- Infrastructure constraints  
+- Data size
+- Pattern complexity
+- Interpretability requirements
+- Infrastructure constraints
 
 Forecasting is not about using complex models.
 
 It is about:
 
-- Clean data  
-- Proper validation  
-- Strong baselines  
-- Monitoring in production  
+- Clean data
+- Proper validation
+- Strong baselines
+- Monitoring in production
 
 Understanding fundamentals always precedes complexity.

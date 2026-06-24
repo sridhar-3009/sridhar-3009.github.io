@@ -43,10 +43,10 @@ and build projects that push the state of the art into working software.
 
 **Currently open to** SDE or ML Engineer opportunities.
 
-| | |
-|---|---|
-| 🏢 | ML Engineer @ Accenture |
-| 🚀 | Founder @ MailAir |
-| 📍 | Hyderabad, India |
-| 💻 | 1000+ DSA problems solved |
-| 📄 | 10+ ML papers read |
+|     |                           |
+| --- | ------------------------- |
+| 🏢  | ML Engineer @ Accenture   |
+| 🚀  | Founder @ MailAir         |
+| 📍  | Hyderabad, India          |
+| 💻  | 1000+ DSA problems solved |
+| 📄  | 10+ ML papers read        |
