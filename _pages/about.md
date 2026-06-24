@@ -2,33 +2,51 @@
 layout: about
 title: about
 permalink: /
-subtitle: <a href='#'>Affiliations</a>. Address. Contacts. Motto. Etc.
+subtitle: >
+  ML Engineer · <a href="https://www.accenture.com" target="_blank">Accenture</a> ·
+  Founder of <a href="https://github.com/sridhar-3009" target="_blank">MailAir</a> ·
+  Hyderabad, India
 
 profile:
   align: right
   image: prof_pic.jpg
-  image_circular: false # crops the image to make it circular
+  image_circular: true
   more_info: >
-    <p>555 your office number</p>
-    <p>123 your address street</p>
-    <p>Your City, State 12345</p>
+    <p>Machine Learning Engineer</p>
+    <p>Hyderabad, India</p>
+    <p>Open to SDE / ML opportunities</p>
 
-selected_papers: true # includes a list of papers marked as "selected={true}"
-social: true # includes social icons at the bottom of the page
+selected_papers: false
+social: true
 
 announcements:
-  enabled: true # includes a list of news items
-  scrollable: true # adds a vertical scroll bar if there are more than 3 news items
-  limit: 5 # leave blank to include all the news in the `_news` folder
+  enabled: false
 
 latest_posts:
   enabled: true
-  scrollable: true # adds a vertical scroll bar if there are more than 3 new posts items
-  limit: 3 # leave blank to include all the blog posts
+  scrollable: true
+  limit: 3
 ---
 
-Write your biography here. Tell the world about yourself. Link to your favorite [subreddit](https://www.reddit.com). You can put a picture in, too. The code is already in, just name your picture `prof_pic.jpg` and put it in the `img/` folder.
+I'm a **Machine Learning Engineer at Accenture** and the founder of **MailAir** — an AI-powered
+email assistant that uses LLMs and RAG to auto-draft replies, summarise threads, and surface
+high-priority emails.
 
-Put your address / P.O. box / other info right below your picture. You can also disable any of these elements by editing `profile` property of the YAML header of your `_pages/about.md`. Edit `_bibliography/papers.bib` and Jekyll will render your [publications page](/al-folio/publications/) automatically.
+At Accenture I design and deploy ML pipelines, build NLP workflows, and deliver data-driven
+systems for enterprise clients on SAP SuccessFactors at scale. My interests span large language
+models, MLOps, and backend systems — bridging the gap between research and production.
 
-Link to your social media connections, too. This theme is set up to use [Font Awesome icons](https://fontawesome.com/) and [Academicons](https://jpswalsh.github.io/academicons/), like the ones below. Add your Facebook, Twitter, LinkedIn, Google Scholar, or just disable all of them.
+I continuously read papers from NeurIPS and ICML, practice DSA (1000+ LeetCode problems solved),
+and build projects that push the state of the art into working software.
+
+---
+
+**Currently open to** SDE or ML Engineer opportunities.
+
+| | |
+|---|---|
+| 🏢 | ML Engineer @ Accenture |
+| 🚀 | Founder @ MailAir |
+| 📍 | Hyderabad, India |
+| 💻 | 1000+ DSA problems solved |
+| 📄 | 10+ ML papers read |
